@@ -88,3 +88,7 @@ A base **não tem** telefone nem e-mail. Decisão: o botão de WhatsApp abre `ht
 ## Qualidade
 - Checar no celular (375px) a fila do consultor e o detalhe do cliente antes de qualquer outra tela.
 - README deve explicar: como rodar, como atualizar a base, variáveis do Supabase, decisões de dados, e ter a seção **"Tratamento dos dados"** com as inconsistências e decisões (fonte: `data/processed/qualidade_dados.json`; atualizar a tabela quando o pipeline mudar).
+
+## Fluxo de entrega
+- Depois de cada rodada de alterações: commit, push na branch de trabalho, **abrir o PR para a `main` e fazer o merge** quando ele estiver mergeável (sem conflito e com checks verdes). Se não der para fazer o merge, avisar o motivo.
+- Após o merge, a próxima rodada começa da `main` atualizada (recriar a branch de trabalho a partir de `origin/main`).
