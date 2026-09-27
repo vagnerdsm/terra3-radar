@@ -77,10 +77,13 @@ As políticas do `schema.sql` liberam leitura e escrita para a chave anon, porqu
 
 ## O app
 - **Seleção de acesso**: Diretoria, 4 gerentes e 11 consultores (`usuarios`). "Trocar acesso" fica sempre no topo.
-- **Consultor** (mobile-first): quantas ações da semana já fez, selo do foco, chips por faixa, fila de cards
-  (fixados no topo, depois quem o foco faz subir, depois score). O detalhe abre como *bottom sheet* no celular e painel lateral no desktop,
-  com WhatsApp, "O que fazer", contexto, "Por que este score" e o registro do contato. Ao voltar do WhatsApp,
-  o app pergunta "Como foi?".
+- **Consultor** (mobile-first): quantas ações da semana já fez, aviso do foco, chips por faixa, fila de cards
+  com a **etiqueta da faixa** (o número do score não aparece em nenhuma tela). O detalhe abre como *bottom sheet*
+  no celular e painel lateral no desktop, com WhatsApp, "O que fazer", contexto, "Por que está no topo" (motivos
+  em texto) e o registro do contato. Ao voltar do WhatsApp, o app pergunta "Como foi?".
+- **Como a fila é montada**: aberta pelo ⓘ ao lado do título da fila (e pelo link no aviso do foco, para
+  gerente e diretoria). Tela cheia no celular, painel lateral no desktop. Explica os quatro sinais em pontos,
+  as etiquetas, o foco e mostra o exemplo da Lajeado Sementes calculado do `radar.json`.
 - **Gerente**: GUN e Gerente travados, Consultor livre. KPIs da regional, tabela de consultores com
   execução da fila, Top 5 com **Fixar** (máx. 3 por consultor, com nota). Clicar num consultor abre a fila dele.
 - **Diretoria**: filtros em cascata GUN → Gerente → Consultor, KPIs, cards das UNs, tabela de regionais,
@@ -94,15 +97,20 @@ um registro de contato desde segunda-feira.
 O score e a faixa de cada cliente vêm sempre do `radar.json`; o front não recalcula nada. O foco da diretoria
 só **reordena as filas**:
 
-| Foco | Efeito |
+| Foco | Grupo que vai ao topo |
 |---|---|
-| Ganhar share (padrão) | Ordem normal, por score |
-| Recuperar base | Clientes com "Reativar" ou "Recuperar volume" em qualquer posição de `acoes` sobem para o topo; essa ação vira a principal exibida |
-| Destravar pipeline | O mesmo, com "Destravar negociação" |
+| Prioridade geral (padrão) | Nenhum: a fila segue o score |
+| Ganhar share | Clientes cuja ação principal é "Ampliar share" |
+| Recuperar base | Clientes com "Reativar" ou "Recuperar volume" em qualquer posição de `acoes`; essa ação vira a principal exibida |
+| Destravar pipeline | Clientes com "Destravar negociação" em qualquer posição de `acoes`; essa ação vira a principal exibida |
 
-Ordem da fila: fixados pelo gerente → clientes que o foco faz subir → o resto, sempre por score dentro de cada
-grupo. A diretoria vê quantos clientes sobem para o topo das filas; gerente e consultor veem o foco com a contagem
-de clientes afetados no seu recorte. Um foco com vigência vencida volta sozinho para o padrão.
+Ordem da fila: fixados pelo gerente → grupo do foco → o resto, sempre por score dentro de cada grupo. A mensagem
+do foco fala com quem lê, com a contagem do recorte dele (ex.: consultor: "Seus 8 clientes com negociação parada
+vêm primeiro."; gerente: "20 clientes da sua regional subiram ao topo das filas."; diretoria ao escolher:
+"56 negociações paradas sobem ao topo."). Um foco com vigência vencida volta sozinho para "Prioridade geral".
+
+Quem já usa o Supabase precisa rodar de novo o `schema.sql`: ele atualiza a restrição de `foco_historico`
+para aceitar o novo foco `geral`.
 
 ## Score (0–100, calculado no pipeline)
 | Sinal | Peso | Medida |
@@ -148,8 +156,14 @@ No app, o que afeta um cliente específico aparece de forma discreta no detalhe 
 ## Decisões de dados no app
 - **Tudo vem do `radar.json`** ou do estado salvo. Os KPIs são somados a partir de `clientes`, com os mesmos
   critérios do pipeline, e batem com `arvore`.
-- **"Por que este score"** no detalhe é uma lista de motivos em texto, do sinal mais forte ao mais fraco
-  ("pesa muito / pesa / pesa pouco", a partir de `componentes`), com os dados do cliente em cada frase.
+- **Score fora da tela**: a fila é ordenada pelo score, mas a tela mostra só a etiqueta da faixa. A única
+  exceção é o exemplo da tela "Como a fila é montada".
+- **"Por que está no topo"** no detalhe lista, em frases com os dados do cliente, os sinais que mais contam
+  (componente × peso do `radar.json`); sinais fracos (componente < 0,33) ficam de fora.
+- **Pontos por sinal** (tela "Como a fila é montada"): componente × peso × 100, arredondado pelo método dos
+  maiores restos para que a soma bata exatamente com o score do `radar.json`. Na Lajeado Sementes os valores
+  brutos são 38,5 + 20,0 + 12,4 + 20,0 = 90,9 (score 91); o arredondamento simples daria 38 + 20 + 12 + 20 = 90,
+  por isso a tela mostra 39 + 20 + 12 + 20 = 91.
 - **Contatos**: a base não tem telefone nem e-mail. O WhatsApp abre `https://wa.me/?text=…` **sem número**,
   com mensagem pré-escrita conforme a ação principal. Ligar e E-mail aparecem desabilitados ("viria do Terra3").
 - **Clientes sem nenhuma compra** (8) têm `score` nulo: ficam fora da fila e aparecem como "base inativa".

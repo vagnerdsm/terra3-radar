@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ComoFunciona } from '../components/ComoFunciona';
 import { FocoCard } from '../components/FocoCard';
 import { KpisBloco } from '../components/KpisBloco';
 import { TabelaConsultores } from '../components/TabelaConsultores';
@@ -23,6 +24,7 @@ export function Diretoria() {
   const [regional, setRegional] = useState('');
   const [consultor, setConsultor] = useState('');
   const [filaAberta, setFilaAberta] = useState<string | null>(null);
+  const [comoFunciona, setComoFunciona] = useState(false);
 
   const uns = radar.arvore.uns;
   const regionais: NoRegional[] = uns.filter((u) => !un || u.nome === un).flatMap((u) => u.regionais);
@@ -183,7 +185,7 @@ export function Diretoria() {
         </div>
 
         <div>
-          <FocoCard />
+          <FocoCard onComoFunciona={() => setComoFunciona(true)} />
           <section className="secao">
             <div className="secao-titulo">
               <h2>Mudanças recentes</h2>
@@ -204,6 +206,7 @@ export function Diretoria() {
         </div>
       </div>
 
+      {comoFunciona && <ComoFunciona onFechar={() => setComoFunciona(false)} />}
     </main>
   );
 }

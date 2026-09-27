@@ -2,11 +2,12 @@ import { useState } from 'react';
 import { ClienteCard } from '../components/ClienteCard';
 import { ComoFoi } from '../components/ComoFoi';
 import { Detalhe } from '../components/Detalhe';
-import { Barra, FocoSelo } from '../components/ui';
+import { ComoFunciona } from '../components/ComoFunciona';
+import { Barra, BotaoInfo, FocoAviso } from '../components/ui';
 import { execucao, kpis } from '../derive';
-import { brl, int, pct } from '../format';
+import { brl, int, pct, primeiroNome } from '../format';
 import { useFilas, useHierarquia } from '../hooks';
-import { FAIXAS } from '../scoring';
+import { FAIXAS, mensagemFoco } from '../scoring';
 import { useRadar } from '../store';
 import type { Faixa } from '../types';
 
@@ -19,8 +20,10 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
   const [chip, setChip] = useState<Chip>('Todos');
   const [abertoId, setAbertoId] = useState<number | null>(null);
   const [mostrarTodos, setMostrarTodos] = useState(false);
+  const [comoFunciona, setComoFunciona] = useState(false);
 
   const fila = filas.get(nome) ?? [];
+  const sobem = fila.filter((c) => c.sobe).length;
   const proprio = usuario?.perfil === 'consultor' && usuario.nome === nome;
   const exec = execucao(fila);
   const k = kpis(
@@ -54,7 +57,14 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
           </span>
           <Barra valor={exec.total ? exec.feitas / exec.total : 0} classe="primaria" />
         </div>
-        <FocoSelo foco={foco} afetados={fila.filter((c) => c.sobe).length} onde="da sua carteira" />
+        <FocoAviso
+          foco={foco}
+          mensagem={
+            proprio
+              ? mensagemFoco(foco.foco, sobem, 'consultor')
+              : mensagemFoco(foco.foco, sobem, 'gerente', `da carteira de ${primeiroNome(nome)}`)
+          }
+        />
       </section>
 
       <details className="card indicadores">
@@ -84,6 +94,11 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
           </p>
         )}
       </details>
+
+      <div className="fila-titulo">
+        <h2>{proprio ? 'Sua fila da semana' : 'Fila da semana'}</h2>
+        <BotaoInfo onClick={() => setComoFunciona(true)} />
+      </div>
 
       <div className="chips" role="tablist" aria-label="Filtrar fila">
         {(['Todos', ...FAIXAS] as Chip[]).map((f) => (
@@ -115,6 +130,7 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
       </div>
 
       {aberto && <Detalhe c={aberto} podeRegistrar={proprio} onFechar={() => setAbertoId(null)} />}
+      {comoFunciona && <ComoFunciona onFechar={() => setComoFunciona(false)} />}
       {proprio && <ComoFoi />}
     </main>
   );

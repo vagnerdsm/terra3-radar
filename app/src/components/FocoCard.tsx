@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { data, dataHora } from '../format';
-import { FOCOS } from '../scoring';
+import { aplicarFoco, FOCOS, mensagemFoco, ORDEM_FOCOS, resumoFoco } from '../scoring';
 import { useRadar } from '../store';
 import type { FocoId } from '../types';
-import { FocoSelo } from './ui';
+import { FocoAviso } from './ui';
 
-/** Card "Foco da safra": só a diretoria edita. Não muda o score; só reordena as filas de toda a força de vendas. */
-export function FocoCard() {
-  const { foco, estado, acoes, clientes } = useRadar();
-  // quantos clientes da fila (com score) subiriam com cada foco
-  const sobem = (id: FocoId) =>
-    clientes.filter((c) => c.score != null && c.acoes.some((a) => FOCOS[id].acoes.includes(a.tipo))).length;
+/** Card "Foco da safra": só a diretoria edita. Nunca muda score nem faixa; só reordena as filas. */
+export function FocoCard({ onComoFunciona }: { onComoFunciona(): void }) {
+  const { foco, estado, acoes, radar } = useRadar();
+  // quantos clientes da fila subiriam com cada foco (3tentos inteira)
+  const sobem = (id: FocoId) => radar.clientes.filter((c) => aplicarFoco(c, id).sobe).length;
   const [escolha, setEscolha] = useState<FocoId>(foco.foco);
   const [vigencia, setVigencia] = useState(foco.vigencia_ate ?? '');
   const [nota, setNota] = useState('');
@@ -20,8 +19,10 @@ export function FocoCard() {
   return (
     <section className="card foco-card secao">
       <h2>Foco da safra</h2>
-      <p className="texto-sec pequeno">Não muda o score: reordena as filas de gerentes e consultores, levando para o topo os clientes com a ação do foco. Aparece como selo em todas as telas.</p>
-      <FocoSelo foco={foco} afetados={sobem(foco.foco)} onde="" />
+      <p className="texto-sec pequeno">
+        O foco leva um grupo de clientes ao topo das filas de gerentes e consultores. A prioridade de cada cliente não muda.
+      </p>
+      <FocoAviso foco={foco} mensagem={mensagemFoco(foco.foco, sobem(foco.foco), 'diretoria')} onComoFunciona={onComoFunciona} />
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -31,16 +32,13 @@ export function FocoCard() {
         }}
       >
         <div className="focos-opcoes" role="radiogroup">
-          {(Object.keys(FOCOS) as FocoId[]).map((id) => (
+          {ORDEM_FOCOS.map((id) => (
             <label key={id} className={`foco-opcao${escolha === id ? ' ativo' : ''}`}>
               <input type="radio" name="foco" checked={escolha === id} onChange={() => { setEscolha(id); setSalvo(false); }} />
               <span>
                 <strong>{FOCOS[id].nome}</strong>
-                {id === 'share' && <small>padrão</small>}
-                <small>{FOCOS[id].descricao}</small>
-                <small className="foco-efeito num">
-                  {FOCOS[id].acoes.length ? `${sobem(id)} clientes sobem para o topo das filas` : 'Nenhum cliente muda de posição'}
-                </small>
+                {id === 'geral' && <small>padrão</small>}
+                <small className="foco-efeito num">{resumoFoco(id, sobem(id))}</small>
               </span>
             </label>
           ))}
@@ -58,7 +56,7 @@ export function FocoCard() {
         <button className="btn largo" disabled={!mudou}>
           Publicar foco
         </button>
-        {salvo && <p className="pequeno ok-msg">Foco publicado. Filas reordenadas.</p>}
+        {salvo && <p className="pequeno ok-msg">Foco publicado. As filas já estão na nova ordem.</p>}
       </form>
       {estado.focos.length > 0 && (
         <details className="msg-previa">
@@ -66,7 +64,7 @@ export function FocoCard() {
           <ul className="auditoria">
             {estado.focos.slice(0, 10).map((f) => (
               <li key={f.id}>
-                <strong>{FOCOS[f.foco].nome}</strong>
+                <strong>{FOCOS[f.foco]?.nome ?? f.foco}</strong>
                 <span className="texto-sec">
                   {' '}· {f.autor} · {dataHora(f.criado_em)}
                   {f.vigencia_ate && ` · até ${data(f.vigencia_ate)}`}

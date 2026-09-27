@@ -5,7 +5,7 @@ import { brl, data, dataHora, diasEntre, pct } from '../format';
 import { motivos } from '../scoring';
 import { ROTULO_RESULTADO, useRadar } from '../store';
 import type { Resultado } from '../types';
-import { ScoreCirculo } from './ui';
+import { FaixaEtiqueta } from './ui';
 
 export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegistrar: boolean; onFechar(): void }) {
   const { radar, estado, acoes } = useRadar();
@@ -28,18 +28,14 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
       <aside className="sheet" role="dialog" aria-modal="true" aria-label={c.nome} onClick={(e) => e.stopPropagation()}>
         <div className="sheet-alca" aria-hidden />
         <header className="sheet-topo">
-          <ScoreCirculo score={c.score} faixa={c.faixa} tamanho={56} />
           <div className="sheet-titulo">
+            <FaixaEtiqueta faixa={c.faixa} />
             <h2>{c.nome}</h2>
             <div className="texto-sec">
               {c.cidade} · {c.cultura}
               {c.area_ha ? ` · ${c.area_ha.toLocaleString('pt-BR')} ha` : ''}
             </div>
-            <div className="texto-sec pequeno">
-              {c.faixa ?? 'Sem compras na base'}
-              <br />
-              CNPJ {c.cnpj}
-            </div>
+            <div className="texto-sec pequeno">CNPJ {c.cnpj}</div>
           </div>
           <button className="btn-icone" onClick={onFechar} aria-label="Fechar">
             ✕
@@ -151,15 +147,10 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
               </p>
             )}
 
-            <h4>Por que este score</h4>
+            <h4>Por que está no topo</h4>
             <ul className="motivos">
-              {motivos(c, brl, c.ult_contato ? diasEntre(c.ult_contato, corte) : null).map((m) => (
-                <li key={m.sinal} className={`motivo motivo-${m.peso.replace(' ', '-')}`}>
-                  <span className="motivo-peso">{m.peso}</span>
-                  <span>
-                    <strong>{m.sinal}:</strong> {m.texto}
-                  </span>
-                </li>
+              {motivos(c, radar.meta.pesos, brl, c.ult_contato ? diasEntre(c.ult_contato, corte) : null).map((m) => (
+                <li key={m}>{m}</li>
               ))}
             </ul>
 

@@ -100,7 +100,7 @@ export interface Radar {
 
 /* ---------- estado salvo pelo app (storage.ts) ---------- */
 
-export type FocoId = 'share' | 'base' | 'pipeline';
+export type FocoId = 'geral' | 'share' | 'base' | 'pipeline';
 
 export interface FocoAtivo {
   id: string;

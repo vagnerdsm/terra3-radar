@@ -2,24 +2,22 @@ import type { ItemFila } from '../derive';
 import { brl, primeiroNome } from '../format';
 import { FOCOS } from '../scoring';
 import { ROTULO_RESULTADO, useRadar } from '../store';
-import { ScoreCirculo } from './ui';
+import { FaixaEtiqueta } from './ui';
 
 export function ClienteCard({ c, onAbrir }: { c: ItemFila; onAbrir(): void }) {
   const motivo = c.acoesExibidas[0]?.texto;
   const { foco } = useRadar();
   return (
     <button className={`card cliente-card${c.fixado ? ' fixado' : ''}`} onClick={onAbrir}>
-      <ScoreCirculo score={c.score} faixa={c.faixa} tamanho={52} />
       <div className="cliente-card-corpo">
-        {(c.fixado || c.sobe || c.ultimoRegistro) && (
-          <div className="cliente-card-selos">
-            {c.fixado && <span className="selo selo-fixado">📌 Fixado por {primeiroNome(c.fixado.gerente)}</span>}
-            {c.sobe && <span className="selo selo-foco">◎ {FOCOS[foco.foco].nome}</span>}
-            {c.ultimoRegistro && (
-              <span className={`selo selo-reg-${c.ultimoRegistro.resultado}`}>✓ {ROTULO_RESULTADO[c.ultimoRegistro.resultado]}</span>
-            )}
-          </div>
-        )}
+        <div className="cliente-card-selos">
+          <FaixaEtiqueta faixa={c.faixa} />
+          {c.fixado && <span className="selo selo-fixado">📌 Fixado por {primeiroNome(c.fixado.gerente)}</span>}
+          {c.sobe && <span className="selo selo-foco">◎ {FOCOS[foco.foco].nome}</span>}
+          {c.ultimoRegistro && (
+            <span className={`selo selo-reg-${c.ultimoRegistro.resultado}`}>✓ {ROTULO_RESULTADO[c.ultimoRegistro.resultado]}</span>
+          )}
+        </div>
         <div className="cliente-card-nome">{c.nome}</div>
         <div className="cliente-card-local">
           {c.cidade} · {c.cultura}
