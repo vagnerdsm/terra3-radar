@@ -1,10 +1,10 @@
 import { primeiroNome } from './format';
-import type { Cliente } from './types';
+import type { ClienteFoco } from './scoring';
 
 /** Mensagem pré-escrita conforme a ação principal. Sem número: o usuário escolhe o contato no WhatsApp. */
-export function mensagemWhatsApp(c: Cliente, remetente: string): string {
+export function mensagemWhatsApp(c: ClienteFoco, remetente: string): string {
   const eu = `Olá! Aqui é ${primeiroNome(remetente)}, da 3tentos.`;
-  switch (c.acao_principal) {
+  switch (c.acaoPrincipal) {
     case 'Destravar negociação':
       return `${eu} Queria retomar a conversa sobre ${c.ult_assunto ? `o ${c.ult_assunto.toLowerCase()}` : 'a nossa negociação'}, tem um tempinho essa semana?`;
     case 'Reativar':

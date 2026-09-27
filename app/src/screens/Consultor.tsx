@@ -27,8 +27,8 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
     clientes.filter((c) => c.consultor === nome),
     radar.meta.data_corte,
   );
-  const cont = (f: Chip) => (f === 'Todos' ? fila.length : fila.filter((c) => c.faixaFoco === f).length);
-  const visiveis = chip === 'Todos' ? fila : fila.filter((c) => c.faixaFoco === chip);
+  const cont = (f: Chip) => (f === 'Todos' ? fila.length : fila.filter((c) => c.faixa === f).length);
+  const visiveis = chip === 'Todos' ? fila : fila.filter((c) => c.faixa === chip);
   const LIMITE = 25;
   const lista = mostrarTodos ? visiveis : visiveis.slice(0, LIMITE);
   const aberto = abertoId != null ? fila.find((c) => c.id === abertoId) : undefined;
@@ -54,7 +54,7 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
           </span>
           <Barra valor={exec.total ? exec.feitas / exec.total : 0} classe="primaria" />
         </div>
-        <FocoSelo foco={foco} />
+        <FocoSelo foco={foco} afetados={fila.filter((c) => c.sobe).length} onde="da sua carteira" />
       </section>
 
       <details className="card indicadores">

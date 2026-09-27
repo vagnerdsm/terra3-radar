@@ -78,7 +78,7 @@ As políticas do `schema.sql` liberam leitura e escrita para a chave anon, porqu
 ## O app
 - **Seleção de acesso**: Diretoria, 4 gerentes e 11 consultores (`usuarios`). "Trocar acesso" fica sempre no topo.
 - **Consultor** (mobile-first): quantas ações da semana já fez, selo do foco, chips por faixa, fila de cards
-  (fixados no topo, depois score). O detalhe abre como *bottom sheet* no celular e painel lateral no desktop,
+  (fixados no topo, depois quem o foco faz subir, depois score). O detalhe abre como *bottom sheet* no celular e painel lateral no desktop,
   com WhatsApp, "O que fazer", contexto, "Por que este score" e o registro do contato. Ao voltar do WhatsApp,
   o app pergunta "Como foi?".
 - **Gerente**: GUN e Gerente travados, Consultor livre. KPIs da regional, tabela de consultores com
@@ -86,21 +86,24 @@ As políticas do `schema.sql` liberam leitura e escrita para a chave anon, porqu
 - **Diretoria**: filtros em cascata GUN → Gerente → Consultor, KPIs, cards das UNs, tabela de regionais,
   **Foco da safra** (com vigência e recado), "O que merece atenção", mudanças recentes e **Qualidade dos dados**.
 
-**Execução da fila** = fila da semana (clientes fixados + "Atacar agora" com o foco ativo) que tem ao menos
+**Execução da fila** = fila da semana (clientes fixados + faixa "Atacar agora") que tem ao menos
 um registro de contato desde segunda-feira.
 
 ## Foco da safra
-O front recalcula `score = 100 × Σ(peso × componente)` com os `componentes` do `radar.json` e os pesos do foco
-ativo (mesmas faixas: ≥ 60 / 40–59 / < 40). Com o foco padrão, o resultado bate com o `score` do pipeline em
-todos os clientes. Um foco com vigência vencida volta sozinho para o padrão.
+O score e a faixa de cada cliente vêm sempre do `radar.json`; o front não recalcula nada. O foco da diretoria
+só **reordena as filas**:
 
-| Foco | Oportunidade | Queda | Recência | Lead |
-|---|---|---|---|---|
-| Ganhar share (padrão) | 40% | 25% | 15% | 20% |
-| Recuperar base | 15% | 40% | 35% | 10% |
-| Destravar pipeline | 15% | 15% | 10% | 60% |
+| Foco | Efeito |
+|---|---|
+| Ganhar share (padrão) | Ordem normal, por score |
+| Recuperar base | Clientes com "Reativar" ou "Recuperar volume" em qualquer posição de `acoes` sobem para o topo; essa ação vira a principal exibida |
+| Destravar pipeline | O mesmo, com "Destravar negociação" |
 
-## Score (0–100, pesos do foco padrão)
+Ordem da fila: fixados pelo gerente → clientes que o foco faz subir → o resto, sempre por score dentro de cada
+grupo. A diretoria vê quantos clientes sobem para o topo das filas; gerente e consultor veem o foco com a contagem
+de clientes afetados no seu recorte. Um foco com vigência vencida volta sozinho para o padrão.
+
+## Score (0–100, calculado no pipeline)
 | Sinal | Peso | Medida |
 |---|---|---|
 | Oportunidade | 40% | R$ até o cliente atingir o share do quartil superior da base (19,3% do potencial) |
@@ -121,7 +124,9 @@ Cliente → Consultor → Regional → UN → 3tentos. A hierarquia segue a **ca
 
 ## Decisões de dados no app
 - **Tudo vem do `radar.json`** ou do estado salvo. Os KPIs são somados a partir de `clientes`, com os mesmos
-  critérios do pipeline; com o foco padrão, os totais batem com `arvore`. "Atacar agora" é recontado pelo foco ativo.
+  critérios do pipeline, e batem com `arvore`.
+- **"Por que este score"** no detalhe é uma lista de motivos em texto, do sinal mais forte ao mais fraco
+  ("pesa muito / pesa / pesa pouco", a partir de `componentes`), com os dados do cliente em cada frase.
 - **Contatos**: a base não tem telefone nem e-mail. O WhatsApp abre `https://wa.me/?text=…` **sem número**,
   com mensagem pré-escrita conforme a ação principal. Ligar e E-mail aparecem desabilitados ("viria do Terra3").
 - **Clientes sem nenhuma compra** (8) têm `score` nulo: ficam fora da fila e aparecem como "base inativa".

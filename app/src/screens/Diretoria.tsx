@@ -38,7 +38,7 @@ export function Diretoria() {
     const cons = consultoresEscopo.map((n) => ({ n, ...exec([n]) })).filter((x) => x.total > 0);
     const regs = regionais.map((r) => ({ r, k: kpis(clientes.filter((c) => c.regional === r.nome), corte) }));
 
-    const semToque = escopo.flatMap((n) => filas.get(n) ?? []).filter((c) => (c.fixado || c.faixaFoco === 'Atacar agora') && !c.ultimoRegistro);
+    const semToque = escopo.flatMap((n) => filas.get(n) ?? []).filter((c) => (c.fixado || c.faixa === 'Atacar agora') && !c.ultimoRegistro);
     if (semToque.length) {
       const gap = semToque.reduce((a, c) => a + c.gap_rs, 0);
       p.push({ nivel: 'alta', texto: `${semToque.length} clientes da fila (Atacar agora + fixados) ainda sem contato registrado nesta semana — ${brl(gap)} de espaço.` });

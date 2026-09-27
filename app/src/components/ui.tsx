@@ -16,20 +16,27 @@ export function ScoreCirculo({ score, faixa, tamanho = 48 }: { score: number | n
   );
 }
 
-export function FocoSelo({ foco, compacto = false }: { foco: FocoAtivo; compacto?: boolean }) {
+/** Selo do foco da diretoria. `afetados` = clientes do recorte que sobem para o topo. */
+export function FocoSelo({ foco, afetados, onde }: { foco: FocoAtivo; afetados?: number; onde?: string }) {
   const f = FOCOS[foco.foco];
   const padrao = foco.id === 'padrao';
+  const efeito = !f.acoes.length
+    ? 'fila na ordem normal, por score'
+    : afetados == null
+      ? null
+      : afetados === 0
+        ? `nenhum cliente ${onde ?? ''} é afetado`
+        : `${afetados} ${afetados === 1 ? 'cliente' : 'clientes'} ${onde ?? ''} ${afetados === 1 ? 'sobe' : 'sobem'} para o topo${onde ? '' : ' das filas'}`;
   return (
     <div className="foco-selo" title={f.descricao}>
       <span className="foco-selo-icone" aria-hidden>◎</span>
       <span>
         <strong>Foco da safra: {f.nome}</strong>
-        {!compacto && (
-          <span className="foco-selo-meta">
-            {padrao ? ' · padrão' : ` · por ${foco.autor} em ${data(foco.criado_em)}`}
-            {foco.vigencia_ate && ` · até ${data(foco.vigencia_ate)}`}
-          </span>
-        )}
+        <span className="foco-selo-meta">
+          {padrao ? ' · padrão' : ` · por ${foco.autor} em ${data(foco.criado_em)}`}
+          {foco.vigencia_ate && ` · até ${data(foco.vigencia_ate)}`}
+        </span>
+        {efeito && <span className="foco-selo-efeito">{efeito.replace(/\s+/g, ' ')}</span>}
       </span>
     </div>
   );
