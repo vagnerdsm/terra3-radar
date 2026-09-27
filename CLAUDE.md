@@ -28,10 +28,10 @@ Não altere a lógica do pipeline sem pedir. Não invente números: tudo que apa
 3. **Detalhe do cliente** (bottom sheet no celular, painel lateral no desktop), nesta ordem:
    - Botões de contato: **WhatsApp**, Ligar, E-mail.
    - "O que fazer": as até 3 ações de `acoes`.
-   - Contexto: compras 12m, potencial, share, última compra, último contato do CRM (`ult_status_lead`, `ult_assunto`), "Por que este score" como lista de motivos em texto (a partir de `componentes` e dos dados do cliente), `alertas`.
+   - Contexto: compras 12m, potencial, share, última compra, último contato do CRM (`ult_status_lead`, `ult_assunto`), "Por que este score" como lista de motivos em texto (a partir de `componentes` e dos dados do cliente), `alertas` (texto curto, visual discreto: linha pequena em cinza, sem bloco colorido).
    - Registrar: Contatado · Agendado · Sem sucesso (+ nota opcional). Ao voltar do WhatsApp para o app, mostrar "Como foi?" com esses botões.
 4. **Gerente** (desktop-first, responsivo): filtros GUN e Gerente travados (cadeado), Consultor livre. Aviso do foco da diretoria. KPIs da regional. Tabela de consultores (clientes, fat. 12m, share, na mesa, atacar, parados, **execução da fila** vinda dos registros). Top 5 da regional com botão **Fixar** (máx. 3 por consultor, com nota). Clique no consultor abre a fila dele.
-5. **Diretoria** (desktop-first, responsivo): filtros em cascata GUN → Gerente → Consultor. KPIs da 3tentos, cards das UNs, tabela de regionais. Card **Foco da safra** (só diretoria edita). Painel "O que merece atenção" e **Qualidade dos dados** (lista de `qualidade`, com problema, quantidade e decisão).
+5. **Diretoria** (desktop-first, responsivo): filtros em cascata GUN → Gerente → Consultor. KPIs da 3tentos, cards das UNs, tabela de regionais. Card **Foco da safra** (só diretoria edita). Painel "O que merece atenção". **Sem** painel de qualidade dos dados: o tratamento da base fica documentado no README (seção "Tratamento dos dados").
 
 Hierarquia: cliente → consultor → regional → UN → 3tentos. Cada perfil só enxerga o seu recorte; níveis acima do seu aparecem travados.
 
@@ -66,4 +66,4 @@ A base **não tem** telefone nem e-mail. Decisão: o botão de WhatsApp abre `ht
 
 ## Qualidade
 - Checar no celular (375px) a fila do consultor e o detalhe do cliente antes de qualquer outra tela.
-- README deve explicar: como rodar, como atualizar a base, variáveis do Supabase, decisões de dados.
+- README deve explicar: como rodar, como atualizar a base, variáveis do Supabase, decisões de dados, e ter a seção **"Tratamento dos dados"** com as inconsistências e decisões (fonte: `data/processed/qualidade_dados.json`; atualizar a tabela quando o pipeline mudar).

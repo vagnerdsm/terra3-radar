@@ -84,7 +84,8 @@ As políticas do `schema.sql` liberam leitura e escrita para a chave anon, porqu
 - **Gerente**: GUN e Gerente travados, Consultor livre. KPIs da regional, tabela de consultores com
   execução da fila, Top 5 com **Fixar** (máx. 3 por consultor, com nota). Clicar num consultor abre a fila dele.
 - **Diretoria**: filtros em cascata GUN → Gerente → Consultor, KPIs, cards das UNs, tabela de regionais,
-  **Foco da safra** (com vigência e recado), "O que merece atenção", mudanças recentes e **Qualidade dos dados**.
+  **Foco da safra** (com vigência e recado), "O que merece atenção" e mudanças recentes. O tratamento da base
+  não aparece no app: está documentado em [Tratamento dos dados](#tratamento-dos-dados).
 
 **Execução da fila** = fila da semana (clientes fixados + faixa "Atacar agora") que tem ao menos
 um registro de contato desde segunda-feira.
@@ -117,10 +118,32 @@ Recuperar volume → Ampliar share → Cross-sell → Primeiro contato.
 
 ## Hierarquia
 Cliente → Consultor → Regional → UN → 3tentos. A hierarquia segue a **carteira atual**
-(ver `qualidade_dados.json` sobre a transferência de Diego Fontoura).
+(ver [Tratamento dos dados](#tratamento-dos-dados) sobre a transferência de Diego Fontoura).
 
 ## Data de corte
 20/09/2026 (última transação da base).
+
+## Tratamento dos dados
+Inconsistências encontradas na planilha pelo pipeline e a decisão tomada em cada uma. Fonte:
+`data/processed/qualidade_dados.json` (regenerado a cada execução do pipeline; os números abaixo são da base atual).
+
+| Aba | Inconsistência | Qtd. | Decisão | Impacto |
+|---|---|---:|---|---:|
+| Cadastro_Clientes | Mesma cidade escrita de formas diferentes (ex.: Quaraí/quaraí/Quarai) | 25 | Padronizado para a grafia mais comum com acento | — |
+| Cadastro_Clientes | Área (ha) vazia | 21 | Mantido vazio; potencial vem da aba Potencial_Safra, que está completa | — |
+| Cadastro_Clientes | Cliente "Inativo" no cadastro mas com compra nos últimos 180 dias | 11 | Considerado ativo (comportamento de compra vence o cadastro); sinalizado no detalhe do cliente | — |
+| Cadastro_Clientes | Cliente sem nenhuma transação na base | 8 | Fora da fila de prioridade; tratado como "base inativa" | — |
+| Transacoes | Valor como texto ('R$ 7076,94') | 8 | Convertido para número | — |
+| Transacoes | Transação de cliente inexistente no cadastro (IDs 9xxx) | 6 | Separado em quarentena; não entra em nenhum nível da hierarquia | R$ 90.000,00 |
+| Transacoes | Unidade da Venda diverge da UN atual do consultor (todas na carteira de Diego Fontoura, transferido Sudeste→Sul em ago/2025) | 166 | Hierarquia segue a carteira atual (cliente→consultor→regional→UN); campo original mantido para auditoria | R$ 4.629.138,60 |
+| Interacoes_CRM | Interação de cliente inexistente no cadastro | 3 | Descartado | — |
+| Interacoes_CRM | Clientes sem nenhuma interação registrada | 24 | Tratado como "sem contato": vira sinal de atenção, não erro | — |
+| Potencial_Safra | Share of Wallet vazio | 22 | Não usado no score: share é recalculado a partir das compras reais | — |
+| Potencial_Safra | Share of Wallet declarado não bate com compras reais / potencial | 205 | Correlação 0,06. Score usa o share calculado das transações; declarado fica só como referência | — |
+| Potencial_Safra | Clientes de arroz com potencial calculado só em área de soja+milho | 50 | Mantido; premissa a validar com o negócio | — |
+
+No app, o que afeta um cliente específico aparece de forma discreta no detalhe dele (campo `alertas` do
+`radar.json`): "Inativo no cadastro, mas comprou nos últimos 180 dias" e "Veio na transferência Sudeste → Sul".
 
 ## Decisões de dados no app
 - **Tudo vem do `radar.json`** ou do estado salvo. Os KPIs são somados a partir de `clientes`, com os mesmos

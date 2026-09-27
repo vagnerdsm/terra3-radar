@@ -166,7 +166,9 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
             {c.alertas.length > 0 && (
               <ul className="alertas">
                 {c.alertas.map((a) => (
-                  <li key={a}>⚠ {a}</li>
+                  <li key={a} title={a}>
+                    <span aria-hidden>ⓘ</span> {alertaCurto(a)}
+                  </li>
                 ))}
               </ul>
             )}
@@ -199,6 +201,13 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
       </aside>
     </div>
   );
+}
+
+/** Versão curta dos `alertas` do radar.json; texto original fica no title. */
+function alertaCurto(a: string): string {
+  if (a.startsWith('Cadastro diz Inativo')) return 'Inativo no cadastro, mas comprou nos últimos 180 dias';
+  if (a.startsWith('Cliente transferido')) return 'Veio na transferência Sudeste → Sul';
+  return a;
 }
 
 export function Registrar({ onRegistrar }: { onRegistrar(r: Resultado, nota: string | null): Promise<void> | void }) {

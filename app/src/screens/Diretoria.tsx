@@ -204,36 +204,6 @@ export function Diretoria() {
         </div>
       </div>
 
-      <section className="secao">
-        <div className="secao-titulo">
-          <h2>Qualidade dos dados</h2>
-          <span className="texto-sec pequeno">O que foi encontrado na base e a decisão tomada</span>
-        </div>
-        <div className="card tabela-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Fonte</th>
-                <th>Problema</th>
-                <th className="n">Qtd.</th>
-                <th>Decisão</th>
-                <th className="n">Impacto</th>
-              </tr>
-            </thead>
-            <tbody>
-              {radar.qualidade.map((q, i) => (
-                <tr key={i}>
-                  <td>{q.fonte}</td>
-                  <td>{q.problema}</td>
-                  <td className="n">{int(q.qtd)}</td>
-                  <td>{q.decisao}</td>
-                  <td className="n">{q.impacto ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
     </main>
   );
 }
