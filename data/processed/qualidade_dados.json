@@ -1,0 +1,86 @@
+[
+  {
+    "fonte": "Cadastro_Clientes",
+    "problema": "Mesma cidade escrita de formas diferentes (ex.: Quaraí/quaraí/Quarai)",
+    "qtd": 25,
+    "decisao": "Padronizado para a grafia mais comum com acento",
+    "impacto": null
+  },
+  {
+    "fonte": "Cadastro_Clientes",
+    "problema": "Área (ha) vazia",
+    "qtd": 21,
+    "decisao": "Mantido vazio; potencial vem da aba Potencial_Safra, que está completa",
+    "impacto": null
+  },
+  {
+    "fonte": "Transacoes",
+    "problema": "Valor como texto ('R$ 7076,94')",
+    "qtd": 8,
+    "decisao": "Convertido para número",
+    "impacto": null
+  },
+  {
+    "fonte": "Transacoes",
+    "problema": "Transação de cliente inexistente no cadastro (IDs 9xxx)",
+    "qtd": 6,
+    "decisao": "Separado em quarentena; não entra em nenhum nível da hierarquia",
+    "impacto": "R$ 90.000,00"
+  },
+  {
+    "fonte": "Transacoes",
+    "problema": "Unidade da Venda diverge da UN atual do consultor (todas na carteira de Diego Fontoura, transferido Sudeste→Sul em ago/2025)",
+    "qtd": 166,
+    "decisao": "Hierarquia segue a carteira ATUAL (cliente→consultor→regional→UN). Campo original mantido para auditoria",
+    "impacto": "R$ 4.629.138,60"
+  },
+  {
+    "fonte": "Interacoes_CRM",
+    "problema": "Interação de cliente inexistente no cadastro",
+    "qtd": 3,
+    "decisao": "Descartado",
+    "impacto": null
+  },
+  {
+    "fonte": "Interacoes_CRM",
+    "problema": "Clientes sem nenhuma interação registrada",
+    "qtd": 24,
+    "decisao": "Tratado como 'sem contato' — vira sinal de atenção, não erro",
+    "impacto": null
+  },
+  {
+    "fonte": "Potencial_Safra",
+    "problema": "Share of Wallet vazio",
+    "qtd": 22,
+    "decisao": "Não usado no score: share é recalculado a partir das compras reais",
+    "impacto": null
+  },
+  {
+    "fonte": "Potencial_Safra",
+    "problema": "Share of Wallet declarado não bate com compras reais / potencial",
+    "qtd": 205,
+    "decisao": "Correlação 0.06. Score usa share calculado das transações; declarado fica só como referência",
+    "impacto": null
+  },
+  {
+    "fonte": "Potencial_Safra",
+    "problema": "Clientes de arroz com potencial calculado só em área de soja+milho",
+    "qtd": 50,
+    "decisao": "Mantido; sinalizado como premissa a validar com o negócio",
+    "impacto": null
+  },
+  {
+    "fonte": "Cadastro_Clientes",
+    "problema": "Cliente 'Inativo' no cadastro mas com compra nos últimos 180 dias",
+    "qtd": 11,
+    "decisao": "Considerado ativo (comportamento de compra vence o cadastro); sinalizado na tela",
+    "impacto": null
+  },
+  {
+    "fonte": "Cadastro_Clientes",
+    "problema": "Cliente sem nenhuma transação na base",
+    "qtd": 8,
+    "decisao": "Fora da fila de prioridade; listado como 'base inativa'",
+    "impacto": null
+  }
+]
