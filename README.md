@@ -77,14 +77,18 @@ As políticas do `schema.sql` liberam leitura e escrita para a chave anon, porqu
 
 ## O app
 - **Seleção de acesso**: Diretoria, 4 gerentes e 11 consultores (`usuarios`). "Trocar acesso" fica sempre no topo.
-- **Consultor** (mobile-first): quantas ações da semana já fez, selo do foco, chips por faixa, fila de cards
-  (fixados no topo, depois quem o foco faz subir, depois score). O detalhe abre como *bottom sheet* no celular e painel lateral no desktop,
-  com WhatsApp, "O que fazer", contexto, "Por que este score" e o registro do contato. Ao voltar do WhatsApp,
-  o app pergunta "Como foi?".
+- **Consultor** (mobile-first): quantas ações da semana já fez, aviso do foco, chips por faixa, fila de cards
+  com a **etiqueta da faixa** (o número do score não aparece em nenhuma tela). O detalhe abre como *bottom sheet*
+  no celular e painel lateral no desktop, com WhatsApp, "O que fazer", contexto, "Por que está no topo" (motivos
+  em texto) e o registro do contato. Ao voltar do WhatsApp, o app pergunta "Como foi?".
+- **Como a fila é montada**: aberta pelo ⓘ ao lado do título da fila (e pelo link no aviso do foco, para
+  gerente e diretoria). Tela cheia no celular, painel lateral no desktop. Explica os quatro sinais em pontos,
+  as etiquetas, o foco e mostra o exemplo da Lajeado Sementes calculado do `radar.json`.
 - **Gerente**: GUN e Gerente travados, Consultor livre. KPIs da regional, tabela de consultores com
   execução da fila, Top 5 com **Fixar** (máx. 3 por consultor, com nota). Clicar num consultor abre a fila dele.
 - **Diretoria**: filtros em cascata GUN → Gerente → Consultor, KPIs, cards das UNs, tabela de regionais,
-  **Foco da safra** (com vigência e recado), "O que merece atenção", mudanças recentes e **Qualidade dos dados**.
+  **Foco da safra** (com vigência e recado), "O que merece atenção" e mudanças recentes. O tratamento da base
+  não aparece no app: está documentado em [Tratamento dos dados](#tratamento-dos-dados).
 
 **Execução da fila** = fila da semana (clientes fixados + faixa "Atacar agora") que tem ao menos
 um registro de contato desde segunda-feira.
@@ -93,15 +97,20 @@ um registro de contato desde segunda-feira.
 O score e a faixa de cada cliente vêm sempre do `radar.json`; o front não recalcula nada. O foco da diretoria
 só **reordena as filas**:
 
-| Foco | Efeito |
+| Foco | Grupo que vai ao topo |
 |---|---|
-| Ganhar share (padrão) | Ordem normal, por score |
-| Recuperar base | Clientes com "Reativar" ou "Recuperar volume" em qualquer posição de `acoes` sobem para o topo; essa ação vira a principal exibida |
-| Destravar pipeline | O mesmo, com "Destravar negociação" |
+| Prioridade geral (padrão) | Nenhum: a fila segue o score |
+| Ganhar share | Clientes cuja ação principal é "Ampliar share" |
+| Recuperar base | Clientes com "Reativar" ou "Recuperar volume" em qualquer posição de `acoes`; essa ação vira a principal exibida |
+| Destravar pipeline | Clientes com "Destravar negociação" em qualquer posição de `acoes`; essa ação vira a principal exibida |
 
-Ordem da fila: fixados pelo gerente → clientes que o foco faz subir → o resto, sempre por score dentro de cada
-grupo. A diretoria vê quantos clientes sobem para o topo das filas; gerente e consultor veem o foco com a contagem
-de clientes afetados no seu recorte. Um foco com vigência vencida volta sozinho para o padrão.
+Ordem da fila: fixados pelo gerente → grupo do foco → o resto, sempre por score dentro de cada grupo. A mensagem
+do foco fala com quem lê, com a contagem do recorte dele (ex.: consultor: "Seus 8 clientes com negociação parada
+vêm primeiro."; gerente: "20 clientes da sua regional subiram ao topo das filas."; diretoria ao escolher:
+"56 negociações paradas sobem ao topo."). Um foco com vigência vencida volta sozinho para "Prioridade geral".
+
+Quem já usa o Supabase precisa rodar de novo o `schema.sql`: ele atualiza a restrição de `foco_historico`
+para aceitar o novo foco `geral`.
 
 ## Score (0–100, calculado no pipeline)
 | Sinal | Peso | Medida |
@@ -117,16 +126,44 @@ Recuperar volume → Ampliar share → Cross-sell → Primeiro contato.
 
 ## Hierarquia
 Cliente → Consultor → Regional → UN → 3tentos. A hierarquia segue a **carteira atual**
-(ver `qualidade_dados.json` sobre a transferência de Diego Fontoura).
+(ver [Tratamento dos dados](#tratamento-dos-dados) sobre a transferência de Diego Fontoura).
 
 ## Data de corte
 20/09/2026 (última transação da base).
 
+## Tratamento dos dados
+Inconsistências encontradas na planilha pelo pipeline e a decisão tomada em cada uma. Fonte:
+`data/processed/qualidade_dados.json` (regenerado a cada execução do pipeline; os números abaixo são da base atual).
+
+| Aba | Inconsistência | Qtd. | Decisão | Impacto |
+|---|---|---:|---|---:|
+| Cadastro_Clientes | Mesma cidade escrita de formas diferentes (ex.: Quaraí/quaraí/Quarai) | 25 | Padronizado para a grafia mais comum com acento | — |
+| Cadastro_Clientes | Área (ha) vazia | 21 | Mantido vazio; potencial vem da aba Potencial_Safra, que está completa | — |
+| Cadastro_Clientes | Cliente "Inativo" no cadastro mas com compra nos últimos 180 dias | 11 | Considerado ativo (comportamento de compra vence o cadastro); sinalizado no detalhe do cliente | — |
+| Cadastro_Clientes | Cliente sem nenhuma transação na base | 8 | Fora da fila de prioridade; tratado como "base inativa" | — |
+| Transacoes | Valor como texto ('R$ 7076,94') | 8 | Convertido para número | — |
+| Transacoes | Transação de cliente inexistente no cadastro (IDs 9xxx) | 6 | Separado em quarentena; não entra em nenhum nível da hierarquia | R$ 90.000,00 |
+| Transacoes | Unidade da Venda diverge da UN atual do consultor (todas na carteira de Diego Fontoura, transferido Sudeste→Sul em ago/2025) | 166 | Hierarquia segue a carteira atual (cliente→consultor→regional→UN); campo original mantido para auditoria | R$ 4.629.138,60 |
+| Interacoes_CRM | Interação de cliente inexistente no cadastro | 3 | Descartado | — |
+| Interacoes_CRM | Clientes sem nenhuma interação registrada | 24 | Tratado como "sem contato": vira sinal de atenção, não erro | — |
+| Potencial_Safra | Share of Wallet vazio | 22 | Não usado no score: share é recalculado a partir das compras reais | — |
+| Potencial_Safra | Share of Wallet declarado não bate com compras reais / potencial | 205 | Correlação 0,06. Score usa o share calculado das transações; declarado fica só como referência | — |
+| Potencial_Safra | Clientes de arroz com potencial calculado só em área de soja+milho | 50 | Mantido; premissa a validar com o negócio | — |
+
+No app, o que afeta um cliente específico aparece de forma discreta no detalhe dele (campo `alertas` do
+`radar.json`): "Inativo no cadastro, mas comprou nos últimos 180 dias" e "Veio na transferência Sudeste → Sul".
+
 ## Decisões de dados no app
 - **Tudo vem do `radar.json`** ou do estado salvo. Os KPIs são somados a partir de `clientes`, com os mesmos
   critérios do pipeline, e batem com `arvore`.
-- **"Por que este score"** no detalhe é uma lista de motivos em texto, do sinal mais forte ao mais fraco
-  ("pesa muito / pesa / pesa pouco", a partir de `componentes`), com os dados do cliente em cada frase.
+- **Score fora da tela**: a fila é ordenada pelo score, mas a tela mostra só a etiqueta da faixa. A única
+  exceção é o exemplo da tela "Como a fila é montada".
+- **"Por que está no topo"** no detalhe lista, em frases com os dados do cliente, os sinais que mais contam
+  (componente × peso do `radar.json`); sinais fracos (componente < 0,33) ficam de fora.
+- **Pontos por sinal** (tela "Como a fila é montada"): componente × peso × 100, arredondado pelo método dos
+  maiores restos para que a soma bata exatamente com o score do `radar.json`. Na Lajeado Sementes os valores
+  brutos são 38,5 + 20,0 + 12,4 + 20,0 = 90,9 (score 91); o arredondamento simples daria 38 + 20 + 12 + 20 = 90,
+  por isso a tela mostra 39 + 20 + 12 + 20 = 91.
 - **Contatos**: a base não tem telefone nem e-mail. O WhatsApp abre `https://wa.me/?text=…` **sem número**,
   com mensagem pré-escrita conforme a ação principal. Ligar e E-mail aparecem desabilitados ("viria do Terra3").
 - **Clientes sem nenhuma compra** (8) têm `score` nulo: ficam fora da fila e aparecem como "base inativa".

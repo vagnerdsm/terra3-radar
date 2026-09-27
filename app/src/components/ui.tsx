@@ -1,44 +1,43 @@
 import type { ReactNode } from 'react';
-import { classeFaixa, FOCOS } from '../scoring';
+import { classeFaixa } from '../scoring';
 import { data } from '../format';
 import type { Faixa, FocoAtivo } from '../types';
 
-export function ScoreCirculo({ score, faixa, tamanho = 48 }: { score: number | null; faixa: Faixa | null; tamanho?: number }) {
+/** Etiqueta da faixa. O número do score nunca aparece na tela. */
+export function FaixaEtiqueta({ faixa }: { faixa: Faixa | null }) {
+  return <span className={`etiqueta etiqueta-${classeFaixa(faixa)}`}>{faixa ?? 'Sem compras'}</span>;
+}
+
+/** Aviso do foco da diretoria: mensagem para quem lê + quem definiu e até quando. */
+export function FocoAviso({ foco, mensagem, onComoFunciona }: { foco: FocoAtivo; mensagem: string; onComoFunciona?: () => void }) {
+  const padrao = foco.id === 'padrao';
   return (
-    <div
-      className={`score ${classeFaixa(faixa)}`}
-      style={{ width: tamanho, height: tamanho, fontSize: tamanho * 0.38 }}
-      aria-label={score == null ? 'Sem score' : `Score ${score}, ${faixa}`}
-      title={faixa ?? 'Sem compras na base'}
-    >
-      {score ?? '—'}
+    <div className={`foco-selo${foco.foco === 'geral' ? ' foco-geral' : ''}`}>
+      <span className="foco-selo-icone" aria-hidden>◎</span>
+      <span>
+        <span className="foco-selo-texto">{mensagem}</span>
+        {!padrao && (
+          <span className="foco-selo-meta">
+            Definido por {foco.autor} em {data(foco.criado_em)}
+            {foco.vigencia_ate && ` · até ${data(foco.vigencia_ate)}`}
+            {foco.nota && ` · “${foco.nota}”`}
+          </span>
+        )}
+        {onComoFunciona && (
+          <button className="btn-link foco-selo-link" onClick={onComoFunciona}>
+            ⓘ Como a fila é montada
+          </button>
+        )}
+      </span>
     </div>
   );
 }
 
-/** Selo do foco da diretoria. `afetados` = clientes do recorte que sobem para o topo. */
-export function FocoSelo({ foco, afetados, onde }: { foco: FocoAtivo; afetados?: number; onde?: string }) {
-  const f = FOCOS[foco.foco];
-  const padrao = foco.id === 'padrao';
-  const efeito = !f.acoes.length
-    ? 'fila na ordem normal, por score'
-    : afetados == null
-      ? null
-      : afetados === 0
-        ? `nenhum cliente ${onde ?? ''} é afetado`
-        : `${afetados} ${afetados === 1 ? 'cliente' : 'clientes'} ${onde ?? ''} ${afetados === 1 ? 'sobe' : 'sobem'} para o topo${onde ? '' : ' das filas'}`;
+export function BotaoInfo({ onClick }: { onClick(): void }) {
   return (
-    <div className="foco-selo" title={f.descricao}>
-      <span className="foco-selo-icone" aria-hidden>◎</span>
-      <span>
-        <strong>Foco da safra: {f.nome}</strong>
-        <span className="foco-selo-meta">
-          {padrao ? ' · padrão' : ` · por ${foco.autor} em ${data(foco.criado_em)}`}
-          {foco.vigencia_ate && ` · até ${data(foco.vigencia_ate)}`}
-        </span>
-        {efeito && <span className="foco-selo-efeito">{efeito.replace(/\s+/g, ' ')}</span>}
-      </span>
-    </div>
+    <button className="btn-info" onClick={onClick} aria-label="Como a fila é montada" title="Como a fila é montada">
+      ⓘ
+    </button>
   );
 }
 

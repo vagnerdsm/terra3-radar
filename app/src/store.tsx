@@ -112,7 +112,7 @@ export function RadarProvider({ children }: { children: ReactNode }) {
     return {
       definirFoco: (f) =>
         rodar(() =>
-          storage!.definirFoco(f, autor(), `${FOCOS[f.foco].nome}${f.vigencia_ate ? ` até ${f.vigencia_ate.split('-').reverse().join('/')}` : ''}${f.nota ? ` — ${f.nota}` : ''}`),
+          storage!.definirFoco(f, autor(), `${FOCOS[f.foco]?.nome ?? f.foco}${f.vigencia_ate ? ` até ${f.vigencia_ate.split('-').reverse().join('/')}` : ''}${f.nota ? ` — ${f.nota}` : ''}`),
         ),
       fixar: (clienteId, nota) => {
         const c = porId.get(clienteId)!;

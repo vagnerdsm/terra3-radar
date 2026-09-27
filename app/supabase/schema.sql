@@ -5,12 +5,16 @@ create extension if not exists pgcrypto;
 
 create table if not exists foco_historico (
   id uuid primary key default gen_random_uuid(),
-  foco text not null check (foco in ('share', 'base', 'pipeline')),
+  foco text not null constraint foco_historico_foco_check check (foco in ('geral', 'share', 'base', 'pipeline')),
   autor text not null,
   vigencia_ate date,
   nota text,
   criado_em timestamptz not null default now()
 );
+
+-- Bases criadas antes do foco "Prioridade geral" ('geral'): atualiza a restrição.
+alter table foco_historico drop constraint if exists foco_historico_foco_check;
+alter table foco_historico add constraint foco_historico_foco_check check (foco in ('geral', 'share', 'base', 'pipeline'));
 
 create table if not exists fixados (
   id uuid primary key default gen_random_uuid(),

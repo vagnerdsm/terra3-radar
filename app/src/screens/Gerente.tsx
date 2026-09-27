@@ -2,11 +2,12 @@ import { useMemo, useState } from 'react';
 import { FixarDialogo } from '../components/FixarDialogo';
 import { KpisBloco } from '../components/KpisBloco';
 import { TabelaConsultores } from '../components/TabelaConsultores';
-import { FocoSelo, Filtro, ScoreCirculo } from '../components/ui';
+import { ComoFunciona } from '../components/ComoFunciona';
+import { FaixaEtiqueta, Filtro, FocoAviso } from '../components/ui';
 import { kpis, type ItemFila } from '../derive';
 import { brl, primeiroNome } from '../format';
 import { useFilas, useHierarquia } from '../hooks';
-import { compararFoco } from '../scoring';
+import { compararFoco, mensagemFoco } from '../scoring';
 import { useRadar } from '../store';
 import { Consultor } from './Consultor';
 
@@ -24,6 +25,7 @@ export function Gerente() {
   const [consultor, setConsultor] = useState('');
   const [filaAberta, setFilaAberta] = useState<string | null>(null);
   const [fixando, setFixando] = useState<ItemFila | null>(null);
+  const [comoFunciona, setComoFunciona] = useState(false);
 
   const escopo = consultor ? [consultor] : nomes;
   const k = kpis(clientes.filter((c) => escopo.includes(c.consultor)), radar.meta.data_corte);
@@ -63,12 +65,16 @@ export function Gerente() {
       </div>
 
       <div className="aviso-foco">
-        <FocoSelo
+        <FocoAviso
           foco={foco}
-          afetados={escopo.flatMap((n) => filas.get(n) ?? []).filter((c) => c.sobe).length}
-          onde={consultor ? `da carteira de ${primeiroNome(consultor)}` : 'da regional'}
+          mensagem={mensagemFoco(
+            foco.foco,
+            escopo.flatMap((n) => filas.get(n) ?? []).filter((c) => c.sobe).length,
+            'gerente',
+            consultor ? `da carteira de ${primeiroNome(consultor)}` : 'da sua regional',
+          )}
+          onComoFunciona={() => setComoFunciona(true)}
         />
-        {foco.nota && <span className="texto-sec pequeno">“{foco.nota}”</span>}
       </div>
 
       <KpisBloco k={k} exec={exec(escopo)} />
@@ -92,7 +98,7 @@ export function Gerente() {
               const cheio = fixadosPor(c.consultor).length >= MAX_FIXADOS;
               return (
                 <li key={c.id}>
-                  <ScoreCirculo score={c.score} faixa={c.faixa} tamanho={40} />
+                  <FaixaEtiqueta faixa={c.faixa} />
                   <div className="top5-info">
                     <strong>{c.nome}</strong>
                     <span>
@@ -122,7 +128,7 @@ export function Gerente() {
           <ul className="card top5">
             {fixadosRegiao.map((c) => (
               <li key={c.id}>
-                <ScoreCirculo score={c.score} faixa={c.faixa} tamanho={40} />
+                <FaixaEtiqueta faixa={c.faixa} />
                 <div className="top5-info">
                   <strong>{c.nome}</strong>
                   <span>
@@ -141,6 +147,7 @@ export function Gerente() {
         </section>
       </div>
 
+      {comoFunciona && <ComoFunciona onFechar={() => setComoFunciona(false)} />}
       {fixando && (
         <FixarDialogo
           c={fixando}
