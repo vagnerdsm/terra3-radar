@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { linkWhatsApp, marcarSaida, mensagemWhatsApp } from '../contato';
 import type { ItemFila } from '../derive';
 import { brl, data, dataHora, diasEntre, pct } from '../format';
-import { COMPONENTES, FOCOS } from '../scoring';
+import { motivos } from '../scoring';
 import { ROTULO_RESULTADO, useRadar } from '../store';
 import type { Resultado } from '../types';
-import { Barra, ScoreCirculo } from './ui';
+import { ScoreCirculo } from './ui';
 
 export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegistrar: boolean; onFechar(): void }) {
-  const { radar, foco, estado, acoes } = useRadar();
-  const pesos = FOCOS[foco.foco].pesos;
+  const { radar, estado, acoes } = useRadar();
   const corte = radar.meta.data_corte;
   const historico = estado.registros.filter((r) => r.cliente_id === c.id).slice().reverse();
   const msg = mensagemWhatsApp(c, c.consultor);
@@ -29,7 +28,7 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
       <aside className="sheet" role="dialog" aria-modal="true" aria-label={c.nome} onClick={(e) => e.stopPropagation()}>
         <div className="sheet-alca" aria-hidden />
         <header className="sheet-topo">
-          <ScoreCirculo score={c.scoreFoco} faixa={c.faixaFoco} tamanho={56} />
+          <ScoreCirculo score={c.score} faixa={c.faixa} tamanho={56} />
           <div className="sheet-titulo">
             <h2>{c.nome}</h2>
             <div className="texto-sec">
@@ -37,7 +36,7 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
               {c.area_ha ? ` · ${c.area_ha.toLocaleString('pt-BR')} ha` : ''}
             </div>
             <div className="texto-sec pequeno">
-              {c.faixaFoco ?? 'Sem compras na base'}
+              {c.faixa ?? 'Sem compras na base'}
               <br />
               CNPJ {c.cnpj}
             </div>
@@ -84,9 +83,9 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
           {/* 2. O que fazer */}
           <section className="bloco">
             <h3>O que fazer</h3>
-            {c.acoes.length ? (
+            {c.acoesExibidas.length ? (
               <ol className="lista-acoes">
-                {c.acoes.map((a, i) => (
+                {c.acoesExibidas.map((a, i) => (
                   <li key={i}>
                     <strong>{a.tipo}</strong>
                     <span>{a.texto}</span>
@@ -153,22 +152,16 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
             )}
 
             <h4>Por que este score</h4>
-            <p className="pequeno texto-sec">Pesos do foco ativo: {FOCOS[foco.foco].nome}. Cada barra é o sinal de 0 a 1; os pontos somam o score.</p>
-            <div className="porque">
-              {COMPONENTES.map((k) => {
-                const v = c.componentes[k.id];
-                const pts = Math.round(100 * v * pesos[k.id]);
-                return (
-                  <div className="porque-linha" key={k.id} title={k.ajuda}>
-                    <span className="porque-nome">{k.nome}</span>
-                    <Barra valor={v} classe="primaria" />
-                    <span className="porque-pts num">
-                      {pts} <small>pts · {Math.round(pesos[k.id] * 100)}%</small>
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+            <ul className="motivos">
+              {motivos(c, brl, c.ult_contato ? diasEntre(c.ult_contato, corte) : null).map((m) => (
+                <li key={m.sinal} className={`motivo motivo-${m.peso.replace(' ', '-')}`}>
+                  <span className="motivo-peso">{m.peso}</span>
+                  <span>
+                    <strong>{m.sinal}:</strong> {m.texto}
+                  </span>
+                </li>
+              ))}
+            </ul>
 
             {c.alertas.length > 0 && (
               <ul className="alertas">

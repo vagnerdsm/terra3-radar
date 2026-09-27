@@ -6,6 +6,7 @@ import { FocoSelo, Filtro, ScoreCirculo } from '../components/ui';
 import { kpis, type ItemFila } from '../derive';
 import { brl, primeiroNome } from '../format';
 import { useFilas, useHierarquia } from '../hooks';
+import { compararFoco } from '../scoring';
 import { useRadar } from '../store';
 import { Consultor } from './Consultor';
 
@@ -33,7 +34,7 @@ export function Gerente() {
       escopo
         .flatMap((n) => filas.get(n) ?? [])
         .filter((c) => !c.fixado)
-        .sort((a, b) => (b.scoreFoco ?? 0) - (a.scoreFoco ?? 0) || b.gap_rs - a.gap_rs)
+        .sort(compararFoco)
         .slice(0, 5),
     [escopo, filas],
   );
@@ -62,7 +63,11 @@ export function Gerente() {
       </div>
 
       <div className="aviso-foco">
-        <FocoSelo foco={foco} />
+        <FocoSelo
+          foco={foco}
+          afetados={escopo.flatMap((n) => filas.get(n) ?? []).filter((c) => c.sobe).length}
+          onde={consultor ? `da carteira de ${primeiroNome(consultor)}` : 'da regional'}
+        />
         {foco.nota && <span className="texto-sec pequeno">“{foco.nota}”</span>}
       </div>
 
@@ -80,18 +85,18 @@ export function Gerente() {
         <section className="secao">
           <div className="secao-titulo">
             <h2>Top 5 {consultor ? `de ${primeiroNome(consultor)}` : 'da regional'}</h2>
-            <span className="texto-sec pequeno">Maiores scores com o foco atual</span>
+            <span className="texto-sec pequeno">Ordem da fila com o foco atual</span>
           </div>
           <ul className="card top5">
             {top5.map((c) => {
               const cheio = fixadosPor(c.consultor).length >= MAX_FIXADOS;
               return (
                 <li key={c.id}>
-                  <ScoreCirculo score={c.scoreFoco} faixa={c.faixaFoco} tamanho={40} />
+                  <ScoreCirculo score={c.score} faixa={c.faixa} tamanho={40} />
                   <div className="top5-info">
                     <strong>{c.nome}</strong>
                     <span>
-                      {c.consultor} · {c.acao_principal} · {brl(c.gap_rs)}
+                      {c.consultor} · {c.acaoPrincipal} · {brl(c.gap_rs)}
                     </span>
                   </div>
                   <button
@@ -117,7 +122,7 @@ export function Gerente() {
           <ul className="card top5">
             {fixadosRegiao.map((c) => (
               <li key={c.id}>
-                <ScoreCirculo score={c.scoreFoco} faixa={c.faixaFoco} tamanho={40} />
+                <ScoreCirculo score={c.score} faixa={c.faixa} tamanho={40} />
                 <div className="top5-info">
                   <strong>{c.nome}</strong>
                   <span>

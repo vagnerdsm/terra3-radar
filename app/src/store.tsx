@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { FOCOS, focoVigente, pontuar, type ClienteScore } from './scoring';
+import { aplicarFoco, FOCOS, focoVigente, type ClienteFoco } from './scoring';
 import { criarStorage, type Estado, type Storage } from './storage';
 import type { Fixado, FocoAtivo, Radar, Registro, Resultado, Usuario } from './types';
 import { registrosDaSemana } from './derive';
@@ -11,8 +11,8 @@ interface Ctx {
   usuario: Usuario | null;
   setUsuario(u: Usuario | null): void;
   foco: FocoAtivo;
-  clientes: ClienteScore[];
-  porId: Map<number, ClienteScore>;
+  clientes: ClienteFoco[];
+  porId: Map<number, ClienteFoco>;
   registrosSemana: Registro[];
   erro: string | null;
   acoes: {
@@ -92,7 +92,7 @@ export function RadarProvider({ children }: { children: ReactNode }) {
   const foco = useMemo(() => focoVigente(estado?.focos[0] ?? null, new Date().toISOString()), [estado]);
 
   const clientes = useMemo(
-    () => (radar ? radar.clientes.map((c) => pontuar(c, FOCOS[foco.foco].pesos)) : []),
+    () => (radar ? radar.clientes.map((c) => aplicarFoco(c, foco.foco)) : []),
     [radar, foco],
   );
   const porId = useMemo(() => new Map(clientes.map((c) => [c.id, c])), [clientes]);

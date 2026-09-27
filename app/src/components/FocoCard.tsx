@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import { data, dataHora } from '../format';
-import { COMPONENTES, FOCOS } from '../scoring';
+import { FOCOS } from '../scoring';
 import { useRadar } from '../store';
 import type { FocoId } from '../types';
 import { FocoSelo } from './ui';
 
-/** Card "Foco da safra": só a diretoria edita. Muda os pesos do score para toda a força de vendas. */
+/** Card "Foco da safra": só a diretoria edita. Não muda o score; só reordena as filas de toda a força de vendas. */
 export function FocoCard() {
-  const { foco, estado, acoes } = useRadar();
+  const { foco, estado, acoes, clientes } = useRadar();
+  // quantos clientes da fila (com score) subiriam com cada foco
+  const sobem = (id: FocoId) =>
+    clientes.filter((c) => c.score != null && c.acoes.some((a) => FOCOS[id].acoes.includes(a.tipo))).length;
   const [escolha, setEscolha] = useState<FocoId>(foco.foco);
   const [vigencia, setVigencia] = useState(foco.vigencia_ate ?? '');
   const [nota, setNota] = useState('');
@@ -17,8 +20,8 @@ export function FocoCard() {
   return (
     <section className="card foco-card secao">
       <h2>Foco da safra</h2>
-      <p className="texto-sec pequeno">Muda os pesos do score para gerentes e consultores. Aparece como selo em todas as telas.</p>
-      <FocoSelo foco={foco} />
+      <p className="texto-sec pequeno">Não muda o score: reordena as filas de gerentes e consultores, levando para o topo os clientes com a ação do foco. Aparece como selo em todas as telas.</p>
+      <FocoSelo foco={foco} afetados={sobem(foco.foco)} onde="" />
       <form
         onSubmit={async (e) => {
           e.preventDefault();
@@ -35,13 +38,9 @@ export function FocoCard() {
                 <strong>{FOCOS[id].nome}</strong>
                 {id === 'share' && <small>padrão</small>}
                 <small>{FOCOS[id].descricao}</small>
-                <span className="pesos num">
-                  {COMPONENTES.map((k) => (
-                    <span key={k.id}>
-                      {k.nome} {Math.round(FOCOS[id].pesos[k.id] * 100)}%
-                    </span>
-                  ))}
-                </span>
+                <small className="foco-efeito num">
+                  {FOCOS[id].acoes.length ? `${sobem(id)} clientes sobem para o topo das filas` : 'Nenhum cliente muda de posição'}
+                </small>
               </span>
             </label>
           ))}
@@ -59,7 +58,7 @@ export function FocoCard() {
         <button className="btn largo" disabled={!mudou}>
           Publicar foco
         </button>
-        {salvo && <p className="pequeno ok-msg">Foco publicado. Filas recalculadas.</p>}
+        {salvo && <p className="pequeno ok-msg">Foco publicado. Filas reordenadas.</p>}
       </form>
       {estado.focos.length > 0 && (
         <details className="msg-previa">

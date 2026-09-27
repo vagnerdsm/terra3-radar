@@ -28,7 +28,7 @@ Não altere a lógica do pipeline sem pedir. Não invente números: tudo que apa
 3. **Detalhe do cliente** (bottom sheet no celular, painel lateral no desktop), nesta ordem:
    - Botões de contato: **WhatsApp**, Ligar, E-mail.
    - "O que fazer": as até 3 ações de `acoes`.
-   - Contexto: compras 12m, potencial, share, última compra, último contato do CRM (`ult_status_lead`, `ult_assunto`), barras de "Por que este score" (`componentes` × pesos), `alertas`.
+   - Contexto: compras 12m, potencial, share, última compra, último contato do CRM (`ult_status_lead`, `ult_assunto`), "Por que este score" como lista de motivos em texto (a partir de `componentes` e dos dados do cliente), `alertas`.
    - Registrar: Contatado · Agendado · Sem sucesso (+ nota opcional). Ao voltar do WhatsApp para o app, mostrar "Como foi?" com esses botões.
 4. **Gerente** (desktop-first, responsivo): filtros GUN e Gerente travados (cadeado), Consultor livre. Aviso do foco da diretoria. KPIs da regional. Tabela de consultores (clientes, fat. 12m, share, na mesa, atacar, parados, **execução da fila** vinda dos registros). Top 5 da regional com botão **Fixar** (máx. 3 por consultor, com nota). Clique no consultor abre a fila dele.
 5. **Diretoria** (desktop-first, responsivo): filtros em cascata GUN → Gerente → Consultor. KPIs da 3tentos, cards das UNs, tabela de regionais. Card **Foco da safra** (só diretoria edita). Painel "O que merece atenção" e **Qualidade dos dados** (lista de `qualidade`, com problema, quantidade e decisão).
@@ -36,13 +36,15 @@ Não altere a lógica do pipeline sem pedir. Não invente números: tudo que apa
 Hierarquia: cliente → consultor → regional → UN → 3tentos. Cada perfil só enxerga o seu recorte; níveis acima do seu aparecem travados.
 
 ## Foco da diretoria (interação entre níveis)
-O score base vem do pipeline, mas o front **recalcula** com os pesos do foco ativo: `score = 100 × Σ(peso_i × componente_i)`, faixas: Atacar agora ≥ 60, Planejar 40–59, Manter < 40.
+O score e as faixas vêm **sempre** do `radar.json` (`score`, `faixa`); o front **não recalcula** nada. O foco só **reordena a fila**:
 
-| Foco | oportunidade | queda | recencia | lead |
-|---|---|---|---|---|
-| Ganhar share (padrão) | 0.40 | 0.25 | 0.15 | 0.20 |
-| Recuperar base | 0.15 | 0.40 | 0.35 | 0.10 |
-| Destravar pipeline | 0.15 | 0.15 | 0.10 | 0.60 |
+| Foco | Efeito na fila |
+|---|---|
+| Ganhar share (padrão) | Ordem normal, por score |
+| Recuperar base | Clientes com ação "Reativar" ou "Recuperar volume" (em qualquer posição de `acoes`) vão para o topo, e essa ação vira a principal exibida |
+| Destravar pipeline | O mesmo, com "Destravar negociação" |
+
+Dentro de cada grupo (quem sobe / o resto), ordenar por score. Na tela **não mostrar percentuais nem pesos**: a diretoria vê "N clientes sobem para o topo das filas"; gerente e consultor veem o foco com a contagem de clientes afetados no seu recorte. No detalhe do cliente, "Por que este score" é uma lista de motivos em texto (não barras).
 
 O foco tem autor, data e vigência; aparece como selo para gerente e consultor. Clientes fixados pelo gerente ficam no topo da fila, acima do score. Toda mudança fica registrada (quem, quando, o quê).
 

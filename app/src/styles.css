@@ -92,6 +92,8 @@ small { font-size: 12px; }
 .card { background: var(--card); border-radius: var(--raio); box-shadow: var(--sombra); }
 .bloco-card { padding: 16px; }
 .selo { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: var(--neutro); color: var(--label); }
+.selo-foco { background: var(--ambar); color: var(--ambar-texto); }
+.foco-selo-efeito { display: block; font-weight: 400; }
 .selo-fixado { background: var(--azul-claro); color: var(--primaria); }
 .selo-reg-contatado { background: var(--verde-claro); color: var(--verde); }
 .selo-reg-agendado { background: var(--azul-claro); color: var(--primaria); }
@@ -234,10 +236,12 @@ small { font-size: 12px; }
 .contexto dt { font-size: 12px; color: var(--label); }
 .contexto dd { margin: 0; font-weight: 600; }
 .contexto dd .pequeno { font-weight: 400; }
-.porque { display: flex; flex-direction: column; gap: 8px; margin-top: 6px; }
-.porque-linha { display: grid; grid-template-columns: 96px 1fr 88px; align-items: center; gap: 8px; font-size: 14px; }
-.porque-pts { text-align: right; font-weight: 700; }
-.porque-pts small { font-weight: 400; color: var(--texto-sec); }
+.motivos { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-direction: column; gap: 8px; }
+.motivo { display: flex; gap: 10px; align-items: baseline; font-size: 14px; }
+.motivo-peso { flex: none; width: 82px; font-size: 12px; font-weight: 700; text-align: center; padding: 2px 0; border-radius: 10px; background: var(--neutro); color: var(--label); }
+.motivo-pesa-muito .motivo-peso { background: var(--vermelho-claro); color: var(--secundaria); }
+.motivo-pesa .motivo-peso { background: var(--ambar); color: var(--ambar-texto); }
+.motivo-pesa-pouco { color: var(--texto-sec); }
 .alertas { list-style: none; padding: 0; margin: 12px 0 0; display: flex; flex-direction: column; gap: 6px; }
 .alertas li { background: var(--ambar); color: var(--ambar-texto); padding: 8px 10px; border-radius: var(--raio); font-size: 14px; }
 .registrar { display: flex; flex-direction: column; gap: 8px; }
@@ -307,7 +311,7 @@ td .link { color: var(--primaria); font-weight: 600; }
 .foco-opcao.ativo { border-color: var(--primaria); background: var(--azul-claro); }
 .foco-opcao input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--primaria); }
 .foco-opcao small { display: block; color: var(--texto-sec); font-size: 12px; }
-.pesos { display: flex; flex-wrap: wrap; gap: 4px 10px; font-size: 12px; color: var(--label); margin-top: 4px; }
+.foco-opcao small.foco-efeito { color: var(--primaria); font-weight: 600; margin-top: 4px; }
 .campos { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 10px; }
 .campo { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--label); font-weight: 600; }
 .atencao { list-style: none; padding: 0; margin: 0; }
