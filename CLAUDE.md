@@ -8,7 +8,7 @@ Pergunta que o app responde: **"Quem eu ataco esta semana, e por quê?"**
 - `data/raw/Case_Terra3_Base_Dados.xlsx` — base original (6 abas).
 - `pipeline/build_data.py` — trata a base, calcula o score e gera `data/processed/radar.json`. Rodar: `pip install -r requirements.txt && python pipeline/build_data.py`.
 - `data/processed/radar.json` — **fonte única de dados do app**. Contém: `meta` (data de corte, benchmark, pesos, faixas), `arvore` (3tentos → UN → regional → consultor, já agregada), `usuarios`, `clientes` (com score, componentes, ações, alertas), `mensal` (série por cliente), `qualidade` (log de tratamento).
-- `app/` — vazio. É aqui que o app deve ser construído.
+- `app/` — app Vite + React + TS (telas: seleção de acesso, consultor, gerente, diretoria). `npm run dev` / `npm run build` dentro de `app/`. Estado em `src/storage.ts` (Supabase ou localStorage); schema em `app/supabase/schema.sql`.
 
 Não altere a lógica do pipeline sem pedir. Não invente números: tudo que aparece na tela vem do `radar.json` ou do estado salvo pelo app.
 
