@@ -8,7 +8,11 @@ import { useRadar } from './store';
 
 export function App() {
   const { usuario, erro } = useRadar();
-  useEffect(() => window.scrollTo(0, 0), [usuario]);
+  // Corpo em bloco de propósito: navegadores novos fazem scrollTo devolver uma Promise, e o React
+  // trataria esse retorno como função de limpeza ("n is not a function" ao trocar de acesso).
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [usuario]);
   return (
     <>
       <Cabecalho />
