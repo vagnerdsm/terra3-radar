@@ -13,7 +13,8 @@ Pergunta que o app responde: **"Quem eu ataco primeiro, e por quê?"**
 Não altere a lógica do pipeline sem pedir. Não invente números: tudo que aparece na tela vem do `radar.json` ou do estado salvo pelo app.
 
 ## Stack
-- Vite + React + TypeScript, CSS simples (ou Tailwind). Deploy na Vercel (build estático, `app/` como raiz).
+- Vite + React + TypeScript, CSS simples (ou Tailwind). Deploy na Vercel (build estático, `app/` como raiz), configurado em `app/vercel.json` (rewrite SPA para `index.html`; `index.html` e `radar.json` sem cache; `assets/` com cache imutável).
+- **Nunca tela em branco**: o app fica dentro de um `ErrorBoundary` (remonta a tela uma vez; se falhar de novo, mostra o erro com botão "Recarregar"). A página tem `translate="no"` para o tradutor automático não mexer no HTML do React.
 - O app lê `radar.json` como arquivo estático (copiar para `app/public/` no build ou importar).
 - Estado compartilhado (foco da diretoria, clientes fixados, registros de contato): **Supabase** quando `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` existirem; sem elas, cair para `localStorage` com a mesma interface (`storage.ts`). O app tem de funcionar nos dois modos.
 - Opcional: GitHub Action que roda o pipeline quando a planilha em `data/raw/` mudar e commita o `radar.json`.
