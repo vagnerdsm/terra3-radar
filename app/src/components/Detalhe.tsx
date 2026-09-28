@@ -5,7 +5,7 @@ import { brl, data, dataHora, diasEntre, pct } from '../format';
 import { motivos } from '../scoring';
 import { ROTULO_RESULTADO, useRadar } from '../store';
 import type { Resultado } from '../types';
-import { FaixaEtiqueta } from './ui';
+import { FaixaEtiqueta, SeloRegistro } from './ui';
 
 export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegistrar: boolean; onFechar(): void }) {
   const { radar, estado, acoes } = useRadar();
@@ -29,7 +29,10 @@ export function Detalhe({ c, podeRegistrar, onFechar }: { c: ItemFila; podeRegis
         <div className="sheet-alca" aria-hidden />
         <header className="sheet-topo">
           <div className="sheet-titulo">
-            <FaixaEtiqueta faixa={c.faixa} />
+            <div className="sheet-selos">
+              <FaixaEtiqueta faixa={c.faixa} />
+              {historico[0] && <SeloRegistro r={historico[0]} />}
+            </div>
             <h2>{c.nome}</h2>
             <div className="texto-sec">
               {c.cidade} · {c.cultura}

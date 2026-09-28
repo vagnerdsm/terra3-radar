@@ -1,8 +1,8 @@
 import type { ItemFila } from '../derive';
 import { brl, primeiroNome } from '../format';
 import { FOCOS } from '../scoring';
-import { ROTULO_RESULTADO, useRadar } from '../store';
-import { FaixaEtiqueta } from './ui';
+import { useRadar } from '../store';
+import { FaixaEtiqueta, SeloRegistro } from './ui';
 
 export function ClienteCard({ c, onAbrir }: { c: ItemFila; onAbrir(): void }) {
   const motivo = c.acoesExibidas[0]?.texto;
@@ -14,9 +14,7 @@ export function ClienteCard({ c, onAbrir }: { c: ItemFila; onAbrir(): void }) {
           <FaixaEtiqueta faixa={c.faixa} />
           {c.fixado && <span className="selo selo-fixado">📌 Fixado por {primeiroNome(c.fixado.gerente)}</span>}
           {c.sobe && <span className="selo selo-foco">◎ {FOCOS[foco.foco].nome}</span>}
-          {c.ultimoRegistro && (
-            <span className={`selo selo-reg-${c.ultimoRegistro.resultado}`}>✓ {ROTULO_RESULTADO[c.ultimoRegistro.resultado]}</span>
-          )}
+          {c.ultimoRegistro && <SeloRegistro r={c.ultimoRegistro} />}
         </div>
         <div className="cliente-card-nome">{c.nome}</div>
         <div className="cliente-card-local">

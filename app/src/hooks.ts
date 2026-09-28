@@ -1,10 +1,10 @@
 import { useMemo } from 'react';
-import { execucao, montarFila, type ItemFila } from './derive';
+import { montarFila, type ItemFila } from './derive';
 import { useRadar } from './store';
 
-/** Fila de cada consultor (com fixados e registros da semana) e a execução dela. */
+/** Fila de cada consultor, com fixados e o último registro de contato de cada cliente. */
 export function useFilas() {
-  const { clientes, estado, registrosSemana } = useRadar();
+  const { clientes, estado } = useRadar();
   return useMemo(() => {
     const filas = new Map<string, ItemFila[]>();
     const nomes = [...new Set(clientes.map((c) => c.consultor))];
@@ -14,20 +14,12 @@ export function useFilas() {
         montarFila(
           clientes.filter((c) => c.consultor === nome),
           estado.fixados.filter((f) => f.consultor === nome),
-          registrosSemana.filter((r) => r.consultor === nome),
+          estado.registros.filter((r) => r.consultor === nome),
         ),
       );
     }
-    const exec = (nomesConsultores: string[]) =>
-      nomesConsultores.reduce(
-        (acc, n) => {
-          const e = execucao(filas.get(n) ?? []);
-          return { feitas: acc.feitas + e.feitas, total: acc.total + e.total };
-        },
-        { feitas: 0, total: 0 },
-      );
-    return { filas, exec };
-  }, [clientes, estado.fixados, registrosSemana]);
+    return { filas };
+  }, [clientes, estado.fixados, estado.registros]);
 }
 
 /** Localiza regional e UN de um consultor/regional na árvore. */

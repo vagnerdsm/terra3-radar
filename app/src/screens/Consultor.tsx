@@ -3,8 +3,8 @@ import { ClienteCard } from '../components/ClienteCard';
 import { ComoFoi } from '../components/ComoFoi';
 import { Detalhe } from '../components/Detalhe';
 import { ComoFunciona } from '../components/ComoFunciona';
-import { Barra, BotaoInfo, FocoAviso } from '../components/ui';
-import { execucao, kpis } from '../derive';
+import { BotaoInfo, FocoAviso } from '../components/ui';
+import { kpis } from '../derive';
 import { brl, int, pct, primeiroNome } from '../format';
 import { useFilas, useHierarquia } from '../hooks';
 import { FAIXAS, mensagemFoco } from '../scoring';
@@ -25,7 +25,6 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
   const fila = filas.get(nome) ?? [];
   const sobem = fila.filter((c) => c.sobe).length;
   const proprio = usuario?.perfil === 'consultor' && usuario.nome === nome;
-  const exec = execucao(fila);
   const k = kpis(
     clientes.filter((c) => c.consultor === nome),
     radar.meta.data_corte,
@@ -48,14 +47,16 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
           <h1>{nome}</h1>
           <span className="texto-sec pequeno">{regionalDoConsultor.get(nome)}</span>
         </div>
-        <div className="consultor-exec">
+        <div className="consultor-resumo">
           <span>
+            Atacar agora:{' '}
             <strong className="num">
-              {exec.feitas} de {exec.total}
-            </strong>{' '}
-            ações feitas na semana
+              {k.atacar} {k.atacar === 1 ? 'cliente' : 'clientes'}
+            </strong>
           </span>
-          <Barra valor={exec.total ? exec.feitas / exec.total : 0} classe="primaria" />
+          <span className="texto-sec pequeno num">
+            {k.leads_parados} {k.leads_parados === 1 ? 'negociação parada' : 'negociações paradas'}
+          </span>
         </div>
         <FocoAviso
           foco={foco}
@@ -96,7 +97,7 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
       </details>
 
       <div className="fila-titulo">
-        <h2>{proprio ? 'Sua fila da semana' : 'Fila da semana'}</h2>
+        <h2>{proprio ? 'Sua fila' : `Fila de ${primeiroNome(nome)}`}</h2>
         <BotaoInfo onClick={() => setComoFunciona(true)} />
       </div>
 

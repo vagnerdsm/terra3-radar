@@ -3,10 +3,9 @@ import { ComoFunciona } from '../components/ComoFunciona';
 import { FocoCard } from '../components/FocoCard';
 import { KpisBloco } from '../components/KpisBloco';
 import { TabelaConsultores } from '../components/TabelaConsultores';
-import { Execucao, Filtro } from '../components/ui';
+import { Filtro } from '../components/ui';
 import { kpis } from '../derive';
 import { brl, dataHora, int, pct } from '../format';
-import { useFilas } from '../hooks';
 import { useRadar } from '../store';
 import type { NoRegional } from '../types';
 import { Consultor } from './Consultor';
@@ -18,7 +17,6 @@ interface Ponto {
 
 export function Diretoria() {
   const { radar, clientes, estado } = useRadar();
-  const { filas, exec } = useFilas();
   const corte = radar.meta.data_corte;
   const [un, setUn] = useState('');
   const [regional, setRegional] = useState('');
@@ -37,17 +35,13 @@ export function Diretoria() {
 
   const atencao = useMemo<Ponto[]>(() => {
     const p: Ponto[] = [];
-    const cons = consultoresEscopo.map((n) => ({ n, ...exec([n]) })).filter((x) => x.total > 0);
     const regs = regionais.map((r) => ({ r, k: kpis(clientes.filter((c) => c.regional === r.nome), corte) }));
 
-    const semToque = escopo.flatMap((n) => filas.get(n) ?? []).filter((c) => (c.fixado || c.faixa === 'Atacar agora') && !c.ultimoRegistro);
-    if (semToque.length) {
-      const gap = semToque.reduce((a, c) => a + c.gap_rs, 0);
-      p.push({ nivel: 'alta', texto: `${semToque.length} clientes da fila (Atacar agora + fixados) ainda sem contato registrado nesta semana — ${brl(gap)} de espaço.` });
+    const atacar = cliEscopo.filter((c) => c.faixa === 'Atacar agora');
+    if (atacar.length) {
+      const gap = atacar.reduce((a, c) => a + c.gap_rs, 0);
+      p.push({ nivel: 'alta', texto: `${atacar.length} clientes para atacar primeiro, com ${brl(gap)} de espaço de compra.` });
     }
-    const pior = cons.slice().sort((a, b) => a.feitas / a.total - b.feitas / b.total)[0];
-    if (pior && cons.length > 1)
-      p.push({ nivel: 'media', texto: `Menor execução da fila: ${pior.n} (${pior.feitas} de ${pior.total} ações na semana).` });
     const maisParados = regs.slice().sort((a, b) => b.k.leads_parados - a.k.leads_parados)[0];
     if (maisParados && maisParados.k.leads_parados)
       p.push({ nivel: 'media', texto: `${k.leads_parados} leads em aberto/negociação sem contato há mais de 30 dias; a regional ${maisParados.r.nome} concentra ${maisParados.k.leads_parados}.` });
@@ -62,7 +56,7 @@ export function Diretoria() {
     if (inativos.length) p.push({ nivel: 'info', texto: `${inativos.length} clientes marcados como Inativos no cadastro compraram nos últimos 180 dias — atualizar o cadastro.` });
     if (k.base_inativa) p.push({ nivel: 'info', texto: `${k.base_inativa} clientes sem nenhuma compra na base ficam fora da fila (base inativa).` });
     return p;
-  }, [consultoresEscopo, escopo, exec, filas, regionais, clientes, corte, k, cliEscopo, radar.meta.benchmark_share]);
+  }, [regionais, clientes, corte, k, cliEscopo, radar.meta.benchmark_share]);
 
   if (filaAberta) return <Consultor nome={filaAberta} onVoltar={() => setFilaAberta(null)} />;
 
@@ -96,7 +90,7 @@ export function Diretoria() {
         />
       </div>
 
-      <KpisBloco k={k} exec={exec(escopo)} />
+      <KpisBloco k={k} />
 
       <div className="uns">
         {uns.map((u) => {
@@ -139,7 +133,6 @@ export function Diretoria() {
                   <th className="n">Na mesa</th>
                   <th className="n">Atacar</th>
                   <th className="n">Parados</th>
-                  <th>Execução da fila</th>
                 </tr>
               </thead>
               <tbody>
@@ -155,7 +148,6 @@ export function Diretoria() {
                       <td className="n">{brl(kr.gap_rs)}</td>
                       <td className="n">{kr.atacar}</td>
                       <td className="n">{kr.leads_parados}</td>
-                      <td><Execucao {...exec(r.consultores.map((c) => c.nome))} /></td>
                     </tr>
                   );
                 })}
