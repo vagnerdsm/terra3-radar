@@ -91,6 +91,8 @@ small { font-size: 12px; }
 .pagina { max-width: 1200px; margin: 0 auto; padding: 16px 16px 48px; }
 .card { background: var(--card); border-radius: var(--raio); box-shadow: var(--sombra); }
 .bloco-card { padding: 16px; }
+.erro-tela { max-width: 520px; margin: 24px auto; display: flex; flex-direction: column; gap: 10px; }
+.erro-tela pre { white-space: pre-wrap; word-break: break-word; background: var(--neutro); padding: 8px 10px; border-radius: var(--raio); font-size: 12px; margin: 0; }
 .selo { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: var(--neutro); color: var(--label); }
 .selo-foco { background: var(--ambar); color: var(--ambar-texto); }
 .foco-selo-efeito { display: block; font-weight: 400; }

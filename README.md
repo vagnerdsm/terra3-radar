@@ -56,6 +56,15 @@ Projeto com **Root Directory = `app`**, framework Vite (detectado automaticament
 saída `dist`. Configure as variáveis do Supabase (abaixo) em *Settings → Environment Variables* para ter
 estado compartilhado. Sem elas, o app funciona do mesmo jeito, só que cada navegador guarda o próprio estado.
 
+`app/vercel.json` fixa build e saída, manda qualquer rota para o `index.html` (SPA) e controla o cache:
+`index.html` e `radar.json` sempre revalidados (um deploy novo aparece sem F5), `assets/` com cache longo
+(os nomes têm hash).
+
+**Tela em branco**: o app tem um `ErrorBoundary` (`src/components/ErrorBoundary.tsx`). Se uma tela quebrar,
+ele remonta a tela sozinho uma vez; se quebrar de novo, mostra "Algo deu errado nesta tela" com a mensagem do
+erro e um botão "Recarregar", em vez de deixar a página branca. A página também pede ao navegador para não
+traduzir automaticamente (`translate="no"`), porque o tradutor altera o HTML por baixo do React.
+
 ## Estado compartilhado: Supabase ou localStorage
 O app grava quatro coisas: **foco da safra** (diretoria), **clientes fixados** (gerente), **registros de
 contato** (consultor) e a **trilha de auditoria** (quem, quando, o quê). Tudo passa por `app/src/storage.ts`,
