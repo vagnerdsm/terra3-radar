@@ -3,7 +3,7 @@ import { FixarDialogo } from '../components/FixarDialogo';
 import { KpisBloco } from '../components/KpisBloco';
 import { TabelaConsultores } from '../components/TabelaConsultores';
 import { ComoFunciona } from '../components/ComoFunciona';
-import { FaixaEtiqueta, Filtro, FocoAviso } from '../components/ui';
+import { FaixaEtiqueta, Filtro, FocoAviso, textoRegistro } from '../components/ui';
 import { kpis, type ItemFila } from '../derive';
 import { brl, primeiroNome } from '../format';
 import { useFilas, useHierarquia } from '../hooks';
@@ -15,7 +15,7 @@ const MAX_FIXADOS = 3;
 
 export function Gerente() {
   const { radar, usuario, foco, clientes, estado, acoes } = useRadar();
-  const { filas, exec } = useFilas();
+  const { filas } = useFilas();
   const { unDaRegional } = useHierarquia();
   const regional = usuario!.escopo!;
   const un = unDaRegional.get(regional) ?? '';
@@ -77,7 +77,7 @@ export function Gerente() {
         />
       </div>
 
-      <KpisBloco k={k} exec={exec(escopo)} />
+      <KpisBloco k={k} />
 
       <section className="secao">
         <div className="secao-titulo">
@@ -133,7 +133,7 @@ export function Gerente() {
                   <strong>{c.nome}</strong>
                   <span>
                     {c.consultor} · por {primeiroNome(c.fixado!.gerente)}
-                    {c.ultimoRegistro ? ' · ✓ trabalhado na semana' : ''}
+                    {c.ultimoRegistro ? ` · ✓ ${textoRegistro(c.ultimoRegistro)}` : ''}
                   </span>
                   {c.fixado!.nota && <div className="top5-nota">“{c.fixado!.nota}”</div>}
                 </div>

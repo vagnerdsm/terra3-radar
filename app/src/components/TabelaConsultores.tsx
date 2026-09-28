@@ -1,13 +1,10 @@
 import { kpis } from '../derive';
 import { brl, int, pct } from '../format';
-import { useFilas } from '../hooks';
 import { useRadar } from '../store';
-import { Execucao } from './ui';
 
-/** Tabela de consultores com execução da fila (registros da semana). */
+/** Tabela de consultores do recorte. Clique abre a fila do consultor. */
 export function TabelaConsultores({ nomes, selecionado, onAbrir }: { nomes: string[]; selecionado?: string; onAbrir(nome: string): void }) {
   const { radar, clientes } = useRadar();
-  const { exec } = useFilas();
   return (
     <div className="card tabela-wrap">
       <table>
@@ -20,13 +17,11 @@ export function TabelaConsultores({ nomes, selecionado, onAbrir }: { nomes: stri
             <th className="n">Na mesa</th>
             <th className="n">Atacar</th>
             <th className="n" title="Leads Aberto/Em negociação sem contato há mais de 30 dias">Parados</th>
-            <th title="Ações da fila (fixados + Atacar agora) registradas nesta semana">Execução da fila</th>
           </tr>
         </thead>
         <tbody>
           {nomes.map((n) => {
             const k = kpis(clientes.filter((c) => c.consultor === n), radar.meta.data_corte);
-            const e = exec([n]);
             return (
               <tr key={n} className={`clicavel${selecionado === n ? ' selecionada' : ''}`} onClick={() => onAbrir(n)}>
                 <td>
@@ -38,9 +33,6 @@ export function TabelaConsultores({ nomes, selecionado, onAbrir }: { nomes: stri
                 <td className="n">{brl(k.gap_rs)}</td>
                 <td className="n">{k.atacar}</td>
                 <td className="n">{k.leads_parados}</td>
-                <td>
-                  <Execucao {...e} />
-                </td>
               </tr>
             );
           })}

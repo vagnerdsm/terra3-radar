@@ -2,29 +2,17 @@ import { diasEntre } from './format';
 import { compararFoco, type ClienteFoco } from './scoring';
 import type { Fixado, Registro } from './types';
 
-/** Segunda-feira 00:00 da semana corrente (horário local). */
-export function inicioDaSemana(d = new Date()): Date {
-  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const dow = (x.getDay() + 6) % 7; // 0 = segunda
-  x.setDate(x.getDate() - dow);
-  return x;
-}
-
-export function registrosDaSemana(registros: Registro[]): Registro[] {
-  const ini = inicioDaSemana().getTime();
-  return registros.filter((r) => Date.parse(r.criado_em) >= ini);
-}
-
 export interface ItemFila extends ClienteFoco {
   fixado: Fixado | null;
-  ultimoRegistro: Registro | null; // desta semana
+  /** Último registro de contato do cliente (sem recorte de período). */
+  ultimoRegistro: Registro | null;
 }
 
 /** Fixados no topo (ordem de fixação), depois quem o foco ativo faz subir, depois o resto; score dentro de cada grupo. Sem compra na base fica fora. */
-export function montarFila(clientes: ClienteFoco[], fixados: Fixado[], registrosSemana: Registro[]): ItemFila[] {
+export function montarFila(clientes: ClienteFoco[], fixados: Fixado[], registros: Registro[]): ItemFila[] {
   const fix = new Map(fixados.map((f) => [f.cliente_id, f]));
   const reg = new Map<number, Registro>();
-  for (const r of registrosSemana) {
+  for (const r of registros) {
     const atual = reg.get(r.cliente_id);
     if (!atual || r.criado_em > atual.criado_em) reg.set(r.cliente_id, r);
   }
@@ -37,12 +25,6 @@ export function montarFila(clientes: ClienteFoco[], fixados: Fixado[], registros
       if (b.fixado) return 1;
       return compararFoco(a, b);
     });
-}
-
-/** Fila da semana = fixados + "Atacar agora". Feita = teve registro nesta semana. */
-export function execucao(fila: ItemFila[]): { feitas: number; total: number } {
-  const alvo = fila.filter((c) => c.fixado || c.faixa === 'Atacar agora');
-  return { feitas: alvo.filter((c) => c.ultimoRegistro).length, total: alvo.length };
 }
 
 export function leadParado(c: ClienteFoco, dataCorte: string): boolean {

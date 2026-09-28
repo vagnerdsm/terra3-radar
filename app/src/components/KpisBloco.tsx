@@ -3,7 +3,7 @@ import type { Kpis } from '../derive';
 import { useRadar } from '../store';
 import { Kpi } from './ui';
 
-export function KpisBloco({ k, exec }: { k: Kpis; exec: { feitas: number; total: number } }) {
+export function KpisBloco({ k }: { k: Kpis }) {
   const { radar } = useRadar();
   const yoy = k.ytd_25 ? k.ytd_26 / k.ytd_25 - 1 : null;
   return (
@@ -13,11 +13,6 @@ export function KpisBloco({ k, exec }: { k: Kpis; exec: { feitas: number; total:
       <Kpi rotulo="Dinheiro na mesa" valor={brl(k.gap_rs)} sub="até o share de referência" destaque />
       <Kpi rotulo="Atacar agora" valor={int(k.atacar)} sub={`${int(k.planejar)} em Planejar · ${int(k.clientes)} clientes`} />
       <Kpi rotulo="Leads parados" valor={int(k.leads_parados)} sub={`${int(k.sem_compra_120d)} sem comprar há +120 dias`} />
-      <Kpi
-        rotulo="Execução da fila"
-        valor={exec.total ? pct(exec.feitas / exec.total, 0) : '—'}
-        sub={`${exec.feitas} de ${exec.total} ações nesta semana`}
-      />
     </div>
   );
 }

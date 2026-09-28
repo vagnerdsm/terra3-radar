@@ -1,6 +1,6 @@
 # Terra3 Radar
 
-Priorização de carteira para a força de vendas da 3tentos: **quem atacar esta semana, e por quê.**
+Priorização de carteira para a força de vendas da 3tentos: **quem atacar primeiro, e por quê.**
 
 Case prático — Consultor de Produtos Digitais · Canais Digitais.
 
@@ -77,21 +77,22 @@ As políticas do `schema.sql` liberam leitura e escrita para a chave anon, porqu
 
 ## O app
 - **Seleção de acesso**: Diretoria, 4 gerentes e 11 consultores (`usuarios`). "Trocar acesso" fica sempre no topo.
-- **Consultor** (mobile-first): quantas ações da semana já fez, aviso do foco, chips por faixa, fila de cards
-  com a **etiqueta da faixa** (o número do score não aparece em nenhuma tela). O detalhe abre como *bottom sheet*
+- **Consultor** (mobile-first): card "Atacar agora: N clientes" com as negociações paradas abaixo, aviso do foco,
+  chips por faixa e "Sua fila", com cards que mostram a **etiqueta da faixa** (o número do score não aparece em
+  nenhuma tela) e o último registro de contato (ex.: "Contatado em 27/09"). O detalhe abre como *bottom sheet*
   no celular e painel lateral no desktop, com WhatsApp, "O que fazer", contexto, "Por que está no topo" (motivos
   em texto) e o registro do contato. Ao voltar do WhatsApp, o app pergunta "Como foi?".
 - **Como a fila é montada**: aberta pelo ⓘ ao lado do título da fila (e pelo link no aviso do foco, para
   gerente e diretoria). Tela cheia no celular, painel lateral no desktop. Explica os quatro sinais em pontos,
   as etiquetas, o foco e mostra o exemplo da Lajeado Sementes calculado do `radar.json`.
-- **Gerente**: GUN e Gerente travados, Consultor livre. KPIs da regional, tabela de consultores com
-  execução da fila, Top 5 com **Fixar** (máx. 3 por consultor, com nota). Clicar num consultor abre a fila dele.
+- **Gerente**: GUN e Gerente travados, Consultor livre. KPIs da regional, tabela de consultores, Top 5 com
+  **Fixar** (máx. 3 por consultor, com nota). Clicar num consultor abre a fila dele.
 - **Diretoria**: filtros em cascata GUN → Gerente → Consultor, KPIs, cards das UNs, tabela de regionais,
   **Foco da safra** (com vigência e recado), "O que merece atenção" e mudanças recentes. O tratamento da base
   não aparece no app: está documentado em [Tratamento dos dados](#tratamento-dos-dados).
 
-**Execução da fila** = fila da semana (clientes fixados + faixa "Atacar agora") que tem ao menos
-um registro de contato desde segunda-feira.
+**Registros de contato** (Contatado, Agendado, Sem sucesso): o app mostra só o último registro de cada cliente,
+com a data, no card e no detalhe. Não há recorte por período nem totais de execução.
 
 ## Foco da safra
 O score e a faixa de cada cliente vêm sempre do `radar.json`; o front não recalcula nada. O foco da diretoria
@@ -169,4 +170,5 @@ No app, o que afeta um cliente específico aparece de forma discreta no detalhe 
 - **Clientes sem nenhuma compra** (8) têm `score` nulo: ficam fora da fila e aparecem como "base inativa".
 - **`NaN` no JSON**: o pipeline grava `NaN` literal em `faixa` desses 8 clientes, o que não é JSON válido
   no navegador. `sync-data.mjs` troca por `null` na cópia do app; o pipeline não foi alterado.
-- Datas de "há N dias" usam a data de corte da base (20/09/2026); a semana dos registros usa a data real.
+- Datas de "há N dias" usam a data de corte da base (20/09/2026); a data dos registros de contato é a data real
+  em que foram feitos.

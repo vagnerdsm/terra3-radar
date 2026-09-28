@@ -1,7 +1,7 @@
 # Terra3 Radar — briefing do projeto
 
 App de priorização de carteira para a força de vendas da 3tentos (case prático, Canais Digitais).
-Pergunta que o app responde: **"Quem eu ataco esta semana, e por quê?"**
+Pergunta que o app responde: **"Quem eu ataco primeiro, e por quê?"**
 É um app à parte do Terra3 (não é uma tela dentro dele): segue o padrão visual do Terra3, sem copiar o layout.
 
 ## Estado atual do repositório
@@ -21,18 +21,18 @@ Não altere a lógica do pipeline sem pedir. Não invente números: tudo que apa
 ## Telas
 1. **Seleção de acesso** (abertura): cards para escolher quem está acessando — Diretoria/GUN, os 4 gerentes regionais, os 11 consultores (lista em `usuarios`). Botão "Trocar acesso" sempre visível no topo (é simulação de login para a demo).
 2. **Consultor — mobile-first** (prioridade máxima; ele abre o link no celular):
-   - Topo enxuto: nome, "X de Y ações feitas na semana", aviso do foco da diretoria (mensagem para o consultor, ver "Foco da diretoria").
-   - Título da fila com ícone ⓘ que abre a tela "Como a fila é montada".
+   - Topo enxuto: nome, card **"Atacar agora: N clientes"** com **"N negociações paradas"** abaixo, aviso do foco da diretoria (mensagem para o consultor, ver "Foco da diretoria").
+   - Título **"Sua fila"** com ícone ⓘ que abre a tela "Como a fila é montada".
    - Filtros em chips: Todos · Atacar agora · Planejar · Manter.
-   - Fila de cards grandes: **etiqueta da faixa** (nunca o número do score), nome, cidade · cultura, ação principal + motivo em uma linha, R$ de espaço. Selo "Fixado por <gerente>" quando houver.
+   - Fila de cards grandes: **etiqueta da faixa** (nunca o número do score), nome, cidade · cultura, ação principal + motivo em uma linha, R$ de espaço. Selo "Fixado por <gerente>" quando houver. Selo do último registro de contato quando houver (ex.: "Contatado em 27/09").
    - Indicadores (fat. 12m, share, dinheiro na mesa) recolhidos num bloco expansível.
 3. **Detalhe do cliente** (bottom sheet no celular, painel lateral no desktop), nesta ordem:
-   - Etiqueta da faixa no topo (sem número de score).
+   - Etiqueta da faixa no topo (sem número de score) e, ao lado, o último registro de contato (ex.: "Contatado em 27/09").
    - Botões de contato: **WhatsApp**, Ligar, E-mail.
    - "O que fazer": as até 3 ações de `acoes` (a do foco primeiro, quando o foco troca a principal).
    - Contexto: compras 12m, potencial, share, última compra, último contato do CRM (`ult_status_lead`, `ult_assunto`), **"Por que está no topo"** como lista de motivos em texto com os dados do cliente (ex.: "Negociação de pós-venda parada há 425 dias", "Sem comprar há 259 dias"; sem barras nem pontos), `alertas` (texto curto, visual discreto: linha pequena em cinza, sem bloco colorido).
-   - Registrar: Contatado · Agendado · Sem sucesso (+ nota opcional). Ao voltar do WhatsApp para o app, mostrar "Como foi?" com esses botões.
-4. **Gerente** (desktop-first, responsivo): filtros GUN e Gerente travados (cadeado), Consultor livre. Aviso do foco da diretoria (com link para "Como a fila é montada"). KPIs da regional. Tabela de consultores (clientes, fat. 12m, share, na mesa, atacar, parados, **execução da fila** vinda dos registros). Top 5 da regional (com etiqueta da faixa, sem score) e botão **Fixar** (máx. 3 por consultor, com nota). Clique no consultor abre a fila dele.
+   - Registrar: Contatado · Agendado · Sem sucesso (+ nota opcional), com o histórico de registros do cliente. Ao voltar do WhatsApp para o app, mostrar "Como foi?" com esses botões.
+4. **Gerente** (desktop-first, responsivo): filtros GUN e Gerente travados (cadeado), Consultor livre. Aviso do foco da diretoria (com link para "Como a fila é montada"). KPIs da regional. Tabela de consultores (clientes, fat. 12m, share, na mesa, atacar, parados). Top 5 da regional (com etiqueta da faixa, sem score) e botão **Fixar** (máx. 3 por consultor, com nota). Clique no consultor abre a fila dele.
 5. **Diretoria** (desktop-first, responsivo): filtros em cascata GUN → Gerente → Consultor. KPIs da 3tentos, cards das UNs, tabela de regionais. Card **Foco da safra** (só diretoria edita; link para "Como a fila é montada"). Painel "O que merece atenção". **Sem** painel de qualidade dos dados: o tratamento da base fica documentado no README (seção "Tratamento dos dados").
 6. **Como a fila é montada**: aberta pelo ⓘ ao lado do título da fila do consultor e pelo link no aviso do foco (gerente e diretoria). Tela cheia com botão de voltar no celular; painel lateral no desktop. Linguagem simples, sempre em **pontos, nunca em percentual**:
    - a) "Sua fila combina quatro sinais para mostrar primeiro quem precisa mais de você."
@@ -44,6 +44,11 @@ Não altere a lógica do pipeline sem pedir. Não invente números: tudo que apa
 ## Score fora da tela
 - A ordem da fila é sempre o score, mas o **número do score não aparece em nenhuma tela** (fila, Top 5, listas da diretoria, detalhe). A única exceção é o exemplo da tela "Como a fila é montada".
 - No lugar do número, etiqueta da faixa: **Atacar agora** fundo `#FFE4E3` texto `#B0282B` · **Planejar** fundo `#FFECBF` texto `#5F4714` · **Manter** fundo `#F0F0F0` texto `#595959`.
+
+## Sem período e sem execução
+- O app **não tem recorte semanal** nem qualquer período: nada de "esta semana", "da semana", "fila da semana" em telas, avisos, mensagens de WhatsApp ou docs. Usar textos sem período (ex.: "quem atacar primeiro", "Sua fila").
+- **Não há contagem de execução da fila**: nada de "X de Y ações feitas", coluna/KPI "Execução da fila" ou pontos de atenção sobre execução.
+- Os registros de contato (Contatado · Agendado · Sem sucesso) continuam: mostrar só o **último registro com a data** no card e no detalhe (ex.: "Contatado em 27/09"), sem totalizar por período.
 
 Hierarquia: cliente → consultor → regional → UN → 3tentos. Cada perfil só enxerga o seu recorte; níveis acima do seu aparecem travados.
 
@@ -70,7 +75,7 @@ O foco tem autor, data e vigência (vencido, volta para "Prioridade geral"); apa
 Teste de referência (375px): com o foco "Destravar pipeline", a fila de Cléber Minuzzi começa por Lajeado Sementes, Cerro Azul Cerealista e Tarumã Sementes.
 
 ## Contatos
-A base **não tem** telefone nem e-mail. Decisão: o botão de WhatsApp abre `https://wa.me/?text=<mensagem>` **sem número** (o usuário escolhe o contato), com mensagem pré-escrita conforme a ação principal. Ex.: "Olá! Aqui é o Cléber, da 3tentos. Queria retomar a conversa sobre o pós-venda, tem um tempinho essa semana?". Ligar/E-mail aparecem desabilitados com a legenda "dado não disponível na base — viria do Terra3". Nunca usar números que possam ser reais.
+A base **não tem** telefone nem e-mail. Decisão: o botão de WhatsApp abre `https://wa.me/?text=<mensagem>` **sem número** (o usuário escolhe o contato), com mensagem pré-escrita conforme a ação principal. Ex.: "Olá! Aqui é o Cléber, da 3tentos. Queria retomar a conversa sobre o pós-venda. Quando fica bom para você?". Ligar/E-mail aparecem desabilitados com a legenda "dado não disponível na base — viria do Terra3". Nunca usar números que possam ser reais.
 
 ## Padrão visual (extraído do Figma do Terra3)
 - Cores: primária `#19294B` (azul 3tentos), secundária `#B0282B` (vermelho), fundo `#F5F5F5`, cards `#FFFFFF`, texto `#3E3E3E`, texto secundário `#676767`, labels `#595959`, bordas `#D8D8D8`, neutro `#F0F0F0`, azul claro `#E0E7F5`, vermelho claro `#FFE4E3`, âmbar `#FFECBF`/`#5F4714`, amarelo `#F3D381`.

@@ -30,6 +30,11 @@ export function data(iso: string | null | undefined): string {
   return `${d}/${m}/${y}`;
 }
 
+/** 27/09 (data local de um timestamp ISO). */
+export function dataCurta(iso: string): string {
+  return new Date(iso).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+}
+
 export function dataHora(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });

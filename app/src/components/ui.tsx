@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react';
 import { classeFaixa } from '../scoring';
-import { data } from '../format';
-import type { Faixa, FocoAtivo } from '../types';
+import { data, dataCurta } from '../format';
+import { ROTULO_RESULTADO } from '../store';
+import type { Faixa, FocoAtivo, Registro } from '../types';
 
 /** Etiqueta da faixa. O número do score nunca aparece na tela. */
 export function FaixaEtiqueta({ faixa }: { faixa: Faixa | null }) {
@@ -85,23 +86,11 @@ export function Filtro({
   );
 }
 
-export function Barra({ valor, max = 1, classe = '' }: { valor: number; max?: number; classe?: string }) {
-  const w = Math.max(0, Math.min(1, max ? valor / max : 0)) * 100;
-  return (
-    <div className="barra">
-      <div className={`barra-fill ${classe}`} style={{ width: `${w}%` }} />
-    </div>
-  );
+/** "Contatado em 27/09": o último registro de contato, sem totalizar por período. */
+export function textoRegistro(r: Registro): string {
+  return `${ROTULO_RESULTADO[r.resultado]} em ${dataCurta(r.criado_em)}`;
 }
 
-export function Execucao({ feitas, total }: { feitas: number; total: number }) {
-  const p = total ? feitas / total : 0;
-  return (
-    <div className="execucao" title={`${feitas} de ${total} ações da fila registradas nesta semana`}>
-      <Barra valor={p} classe={p >= 0.7 ? 'ok' : p >= 0.3 ? 'medio' : 'baixo'} />
-      <span className="num">
-        {feitas}/{total}
-      </span>
-    </div>
-  );
+export function SeloRegistro({ r }: { r: Registro }) {
+  return <span className={`selo selo-reg-${r.resultado}`}>✓ {textoRegistro(r)}</span>;
 }

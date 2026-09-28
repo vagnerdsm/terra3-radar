@@ -127,14 +127,6 @@ small { font-size: 12px; }
 }
 .btn-info:hover { background: var(--azul-claro); }
 
-.barra { flex: 1; height: 8px; background: var(--neutro); border-radius: 4px; overflow: hidden; min-width: 40px; }
-.barra-fill { height: 100%; border-radius: 4px; background: var(--texto-sec); }
-.barra-fill.primaria { background: var(--primaria); }
-.barra-fill.ok { background: var(--verde); }
-.barra-fill.medio { background: #c89a2c; }
-.barra-fill.baixo { background: var(--secundaria); }
-.execucao { display: flex; align-items: center; gap: 8px; min-width: 110px; }
-.execucao span { font-size: 14px; min-width: 40px; text-align: right; }
 
 /* ---------- seleção de acesso ---------- */
 .selecao h1 { margin: 8px 0 4px; }
@@ -160,8 +152,13 @@ small { font-size: 12px; }
 .voltar { margin: -8px 0 4px -4px; }
 .consultor-topo { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
 .consultor-nome h1 { font-size: 22px; }
-.consultor-exec { display: flex; flex-direction: column; gap: 6px; font-size: 16px; }
-.consultor-exec .barra { flex: none; width: 100%; }
+.consultor-resumo {
+  display: flex; flex-direction: column; gap: 2px; font-size: 16px;
+  background: var(--card); box-shadow: var(--sombra); border-radius: var(--raio);
+  border-left: 4px solid var(--secundaria); padding: 10px 12px;
+}
+.consultor-resumo strong { color: var(--secundaria); }
+.sheet-selos { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
 .indicadores { padding: 0 12px; margin-bottom: 12px; }
 .indicadores summary { min-height: 44px; display: flex; align-items: center; font-weight: 600; color: var(--primaria); cursor: pointer; }
 .indicadores[open] { padding-bottom: 12px; }
@@ -204,8 +201,6 @@ small { font-size: 12px; }
   .cliente-card-espaco { flex-direction: column; align-items: flex-end; gap: 0; }
   .cliente-card-espaco span { font-size: 18px; }
   .consultor-topo { display: grid; grid-template-columns: 1fr auto; align-items: end; }
-  .consultor-exec { align-items: flex-end; }
-  .consultor-exec .barra { width: 200px; }
   .consultor-topo .foco-selo { grid-column: 1 / -1; justify-self: start; }
   .indicadores-grade { grid-template-columns: repeat(4, 1fr); }
 }
