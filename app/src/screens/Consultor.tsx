@@ -69,7 +69,12 @@ export function Consultor({ nome, onVoltar }: { nome: string; onVoltar?: () => v
       </section>
 
       <details className="card indicadores">
-        <summary>Indicadores da carteira</summary>
+        <summary>
+          <span>Indicadores da carteira</span>
+          <svg className="seta-accordion" width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </summary>
         <div className="indicadores-grade">
           <div>
             <span className="kpi-rotulo">Fat. 12m</span>

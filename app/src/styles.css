@@ -162,7 +162,14 @@ small { font-size: 12px; }
 .consultor-resumo strong { color: var(--secundaria); }
 .sheet-selos { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
 .indicadores { padding: 0 12px; margin-bottom: 12px; }
-.indicadores summary { min-height: 44px; display: flex; align-items: center; font-weight: 600; color: var(--primaria); cursor: pointer; }
+.indicadores summary {
+  min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-weight: 600; color: var(--primaria); cursor: pointer; list-style: none;
+}
+.indicadores summary::-webkit-details-marker { display: none; }
+.seta-accordion { flex: none; transition: transform .2s ease; }
+.indicadores[open] .seta-accordion { transform: rotate(180deg); }
+@media (prefers-reduced-motion: reduce) { .seta-accordion { transition: none; } }
 .indicadores[open] { padding-bottom: 12px; }
 .indicadores-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .indicadores-grade > div { display: flex; flex-direction: column; }
