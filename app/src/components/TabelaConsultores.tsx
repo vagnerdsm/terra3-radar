@@ -1,6 +1,7 @@
 import { kpis } from '../derive';
 import { brl, int, pct } from '../format';
 import { useRadar } from '../store';
+import { Dica } from './Dica';
 
 /** Tabela de consultores do recorte. Clique abre a fila do consultor. */
 export function TabelaConsultores({ nomes, selecionado, onAbrir }: { nomes: string[]; selecionado?: string; onAbrir(nome: string): void }) {
@@ -12,11 +13,21 @@ export function TabelaConsultores({ nomes, selecionado, onAbrir }: { nomes: stri
           <tr>
             <th>Consultor</th>
             <th className="n">Clientes</th>
-            <th className="n">Fat. 12m</th>
-            <th className="n">Share</th>
-            <th className="n">Na mesa</th>
-            <th className="n">Atacar</th>
-            <th className="n" title="Leads Aberto/Em negociação sem contato há mais de 30 dias">Parados</th>
+            <th className="n">
+              Fat. 12m <Dica metrica="fat_12m" />
+            </th>
+            <th className="n">
+              Share <Dica metrica="share" />
+            </th>
+            <th className="n">
+              Na mesa <Dica metrica="na_mesa" />
+            </th>
+            <th className="n">
+              Atacar <Dica metrica="atacar" />
+            </th>
+            <th className="n">
+              Parados <Dica metrica="parados" />
+            </th>
           </tr>
         </thead>
         <tbody>

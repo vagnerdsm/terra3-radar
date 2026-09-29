@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ComoFunciona } from '../components/ComoFunciona';
+import { Dica } from '../components/Dica';
 import { FocoCard } from '../components/FocoCard';
 import { KpisBloco } from '../components/KpisBloco';
 import { TabelaConsultores } from '../components/TabelaConsultores';
@@ -128,11 +129,21 @@ export function Diretoria() {
                   <th>Regional</th>
                   <th>Gerente</th>
                   <th className="n">Clientes</th>
-                  <th className="n">Fat. 12m</th>
-                  <th className="n">Share</th>
-                  <th className="n">Na mesa</th>
-                  <th className="n">Atacar</th>
-                  <th className="n">Parados</th>
+                  <th className="n">
+                    Fat. 12m <Dica metrica="fat_12m" />
+                  </th>
+                  <th className="n">
+                    Share <Dica metrica="share" />
+                  </th>
+                  <th className="n">
+                    Na mesa <Dica metrica="na_mesa" />
+                  </th>
+                  <th className="n">
+                    Atacar <Dica metrica="atacar" />
+                  </th>
+                  <th className="n">
+                    Parados <Dica metrica="parados" />
+                  </th>
                 </tr>
               </thead>
               <tbody>
