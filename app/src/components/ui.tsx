@@ -2,7 +2,9 @@ import type { ReactNode } from 'react';
 import { classeFaixa } from '../scoring';
 import { data, dataCurta } from '../format';
 import { ROTULO_RESULTADO } from '../store';
+import type { MetricaId } from '../metricas';
 import type { Faixa, FocoAtivo, Registro } from '../types';
+import { Dica } from './Dica';
 
 /** Etiqueta da faixa. O número do score nunca aparece na tela. */
 export function FaixaEtiqueta({ faixa }: { faixa: Faixa | null }) {
@@ -42,10 +44,25 @@ export function BotaoInfo({ onClick }: { onClick(): void }) {
   );
 }
 
-export function Kpi({ rotulo, valor, sub, destaque }: { rotulo: string; valor: ReactNode; sub?: ReactNode; destaque?: boolean }) {
+export function Kpi({
+  rotulo,
+  valor,
+  sub,
+  destaque,
+  dica,
+}: {
+  rotulo: string;
+  valor: ReactNode;
+  sub?: ReactNode;
+  destaque?: boolean;
+  dica?: MetricaId;
+}) {
   return (
     <div className={`kpi${destaque ? ' kpi-destaque' : ''}`}>
-      <div className="kpi-rotulo">{rotulo}</div>
+      <div className="kpi-rotulo">
+        {rotulo}
+        {dica && <Dica metrica={dica} />}
+      </div>
       <div className="kpi-valor num">{valor}</div>
       {sub && <div className="kpi-sub">{sub}</div>}
     </div>

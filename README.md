@@ -99,6 +99,9 @@ As políticas do `schema.sql` liberam leitura e escrita para a chave anon, porqu
 - **Diretoria**: filtros em cascata GUN → Gerente → Consultor, KPIs, cards das UNs, tabela de regionais,
   **Foco da safra** (com vigência e recado), "O que merece atenção" e mudanças recentes. O tratamento da base
   não aparece no app: está documentado em [Tratamento dos dados](#tratamento-dos-dados).
+- **Fórmulas**: em gerente e diretoria, os KPIs e os cabeçalhos das tabelas têm um ⓘ. Ao passar o mouse, ele
+  mostra a fórmula da métrica (ex.: `Na mesa = Σ máx(0; Potencial × 19,4% − Fat. 12m)`). Os textos ficam em
+  `app/src/metricas.ts`, com valores do `radar.json`.
 
 **Registros de contato** (Contatado, Agendado, Sem sucesso): o app mostra só o último registro de cada cliente,
 com a data, no card e no detalhe. Não há recorte por período nem totais de execução.

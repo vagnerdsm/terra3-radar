@@ -34,7 +34,7 @@ Não altere a lógica do pipeline sem pedir. Não invente números: tudo que apa
    - "O que fazer": as até 3 ações de `acoes` (a do foco primeiro, quando o foco troca a principal).
    - Contexto: compras 12m, potencial, share, última compra, último contato do CRM (`ult_status_lead`, `ult_assunto`), **"Por que está no topo"** como lista de motivos em texto com os dados do cliente (ex.: "Negociação de pós-venda parada há 425 dias", "Sem comprar há 259 dias"; sem barras nem pontos), `alertas` (texto curto, visual discreto: linha pequena em cinza, sem bloco colorido).
    - Registrar: Contatado · Agendado · Sem sucesso (+ nota opcional), com o histórico de registros do cliente. Ao voltar do WhatsApp para o app, mostrar "Como foi?" com esses botões.
-4. **Gerente** (desktop-first, responsivo): filtros GUN e Gerente travados (cadeado), Consultor livre. Aviso do foco da diretoria (com link para "Como a fila é montada"). KPIs da regional. Tabela de consultores (clientes, fat. 12m, share, na mesa, atacar, parados). Top 5 da regional (com etiqueta da faixa, sem score) e botão **Fixar** (máx. 3 por consultor, com nota). Clique no consultor abre a fila dele.
+4. **Gerente** (desktop-first, responsivo): filtros GUN e Gerente travados (cadeado), Consultor livre. Aviso do foco da diretoria (com link para "Como a fila é montada"). KPIs da regional. Tabela de consultores (clientes, fat. 12m, share, na mesa, atacar, parados). Métricas com **ícone ⓘ que mostra a fórmula** (ver "Fórmulas das métricas"). Top 5 da regional (com etiqueta da faixa, sem score) e botão **Fixar** (máx. 3 por consultor, com nota). Clique no consultor abre a fila dele.
 5. **Diretoria** (desktop-first, responsivo): filtros em cascata GUN → Gerente → Consultor. KPIs da 3tentos, cards das UNs, tabela de regionais. Card **Foco da safra** (só diretoria edita; link para "Como a fila é montada"). Painel "O que merece atenção". **Sem** painel de qualidade dos dados: o tratamento da base fica documentado no README (seção "Tratamento dos dados").
 6. **Como a fila é montada**: aberta pelo ⓘ ao lado do título da fila do consultor e pelo link no aviso do foco (gerente e diretoria). Tela cheia com botão de voltar no celular; painel lateral no desktop. Linguagem simples, sempre em **pontos, nunca em percentual**:
    - a) "Sua fila combina quatro sinais para mostrar primeiro quem precisa mais de você."
@@ -42,6 +42,12 @@ Não altere a lógica do pipeline sem pedir. Não invente números: tudo que apa
    - c) Etiquetas: Atacar agora (60 pontos ou mais), Planejar (40 a 59), Manter (abaixo de 40), de `meta.faixas`.
    - d) Como o foco da diretoria reordena a fila (fixados primeiro, depois o grupo do foco, depois o resto).
    - e) Exemplo real da **Lajeado Sementes**, calculado do `radar.json` (componente × peso × 100, arredondado por maiores restos para a soma bater com o `score`): "Oportunidade 39 + Queda 20 + Tempo sem comprar 12 + Negociação parada 20 = 91 pontos → Atacar agora". Nunca fixar os números no código.
+
+## Fórmulas das métricas (gerente e diretoria)
+- Nos KPIs e nos cabeçalhos das tabelas de consultores e de regionais, cada métrica (Fat. 12m, Share, Dinheiro na mesa, Atacar agora, Leads parados) tem um **ícone ⓘ**. Ao passar o mouse (ou focar/tocar), abre um balão com a **fórmula**. "Clientes" não precisa de ⓘ.
+- Textos centralizados em `app/src/metricas.ts`, com valores do `radar.json` (data de corte, referência de share, pesos, faixas). Se uma regra mudar no pipeline ou em `derive.ts`, atualizar lá.
+- O balão é renderizado no `<body>` com posição fixa (`components/Dica.tsx`), para não ser cortado pelas tabelas com rolagem. Não colocar ⓘ dentro de elementos clicáveis (ex.: cards das UNs, que são botões).
+- Nesse balão, a fórmula do score (com os pesos) é permitida: é explicação da regra, não o score de um cliente.
 
 ## Score fora da tela
 - A ordem da fila é sempre o score, mas o **número do score não aparece em nenhuma tela** (fila, Top 5, listas da diretoria, detalhe). A única exceção é o exemplo da tela "Como a fila é montada".
